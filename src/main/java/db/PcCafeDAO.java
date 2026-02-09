@@ -8,17 +8,7 @@ import vo.MemberDTO;
 import vo.OrdersDTO;
 import vo.FoodDTO;
 
-public class PcCafeDAO {
-    String url = "jdbc:mysql://localhost:3306/yuls";
-    String user = "root";
-    String pass = "sukyum1003.";
-
-    public Connection getConnection() throws Exception{
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection(url, user, pass);
-        return connection;
-    }
-
+public class PcCafeDAO extends BaseDAO{
 
     // 1. 회원 정보 가져오기
     public MemberDTO getMember(int mem_idx) {

@@ -1,7 +1,6 @@
 package db;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -9,16 +8,7 @@ import java.util.List;
 
 import vo.OrdersDTO;
 
-public class OrderDAO {
-    String url = "jdbc:mysql://localhost:3306/yuls";
-    String user = "root";
-    String pass = "sukyum1003.";
-
-    public Connection getConnection() throws Exception {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection =  DriverManager.getConnection(url, user, pass);
-        return connection;
-    }
+public class OrderDAO extends BaseDAO {
     public List<OrdersDTO> showOrder(){ //모든 주문내역 
         List<OrdersDTO> list = new ArrayList<OrdersDTO>();
         try(Connection conn = getConnection();

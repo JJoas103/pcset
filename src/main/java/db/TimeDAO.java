@@ -1,7 +1,6 @@
 package db;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -9,16 +8,7 @@ import java.util.List;
 
 import vo.TimeDTO;
 
-public class TimeDAO {
-     String url = "jdbc:mysql://localhost:3306/yuls";
-    String user = "root";
-    String pass = "sukyum1003.";
-
-    public Connection getConnection() throws Exception {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection =  DriverManager.getConnection(url, user, pass);
-        return connection;
-    }
+public class TimeDAO extends BaseDAO {
     //시간 메뉴 리스트
     public List<TimeDTO> getAllTime(){
         List<TimeDTO> list = new ArrayList<TimeDTO>();

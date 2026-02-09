@@ -1,24 +1,14 @@
 package db;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import vo.SeatDTO;
 
-public class SeatDAO {
-    String url = "jdbc:mysql://localhost:3306/yuls";
-    String user = "root";
-    String pass = "sukyum1003.";
-
-    public Connection getConnection() throws Exception{
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection(url, user, pass);
-        return connection;
-    }
-
+public class SeatDAO extends BaseDAO{
+    
     public ArrayList<SeatDTO> getAllSeats() {
         ArrayList<SeatDTO> list = new ArrayList<>();
         String sql = "select s.*, m.mem_name, m.mem_age as member_mem_age from seat s " +

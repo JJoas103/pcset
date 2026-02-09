@@ -1,23 +1,12 @@
 package db;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import vo.LogDTO;
 
-public class LogDAO {
-
-    String url = "jdbc:mysql://localhost:3306/yuls";
-    String user = "root";
-    String pass = "sukyum1003.";
-
-    public Connection getConnection() throws Exception{
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection(url, user, pass);
-        return connection;
-    }
+public class LogDAO extends BaseDAO{
 
     // 날짜별 상세 내역 가져오기
     public ArrayList<LogDTO> getLogList(String date) {
