@@ -23,7 +23,6 @@ import db.MemberDAO;
 public class PanelJoin extends JPanel {
 
     public PanelJoin() {
-        // 패널 기본 설정 (PanelLogin과 동일한 스타일)
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 800));
         setBackground(Color.WHITE);
@@ -31,8 +30,6 @@ public class PanelJoin extends JPanel {
         MemberDAO memberDAO = new MemberDAO();
 
         //============== 상단 이미지 패널 ==============================
-        // 회원가입 화면에 어울리는 이미지를 사용합니다 (예: "img/joinImage.png")
-        // 이미지가 없을 경우를 대비해 예외 처리를 포함할 수 있습니다.
         ImageIcon originalIcon = new ImageIcon("src\\main\\java\\img\\loginImage.png");
         Image scaledImg = originalIcon.getImage().getScaledInstance(600, 300, Image.SCALE_SMOOTH);
         JLabel imgLabel = new JLabel(new ImageIcon(scaledImg));
@@ -44,21 +41,19 @@ public class PanelJoin extends JPanel {
         add(imgPanel, BorderLayout.NORTH);
 
         //============= 중단 입력 패널 ==============================
-        JPanel inputPanel = new JPanel(null); // 절대 위치 지정을 위해 null 레이아웃 사용
-        inputPanel.setPreferredSize(new Dimension(600, 300)); // 패널 높이 축소
+        JPanel inputPanel = new JPanel(null); 
+        inputPanel.setPreferredSize(new Dimension(600, 300)); 
         inputPanel.setBackground(Color.WHITE);
 
-        // 레이아웃 값 재조정 (전체적으로 크기 축소)
         int panelWidth = 600;
-        int fieldHeight = 35; // 필드 높이 축소
+        int fieldHeight = 35; 
         int labelWidth = 120;
-        int fieldWidth = 180; // 필드 너비 축소
-        int btnWidth = 90;    // 버튼 너비 축소
+        int fieldWidth = 180; 
+        int btnWidth = 90;   
         int btnGap = 10;
-        int startY = 30;      // 시작 Y좌표
-        int gapY = 20;        // 세로 간격 축소
+        int startY = 30;    
+        int gapY = 20;      
 
-        // 중앙 정렬을 위한 시작 X 좌표 계산
         int totalContentWidth = labelWidth + fieldWidth + btnGap + btnWidth;
         int startXLabel = (panelWidth - totalContentWidth) / 2;
         int startXField = startXLabel + labelWidth;
@@ -69,7 +64,7 @@ public class PanelJoin extends JPanel {
         // 1. 아이디 (ID)
         JLabel idLabel = new JLabel("아이디");
         idLabel.setBounds(startXLabel, currentY, labelWidth, fieldHeight);
-        idLabel.setFont(new Font("나눔고딕", Font.BOLD, 16)); // 폰트 크기 조정
+        idLabel.setFont(new Font("나눔고딕", Font.BOLD, 16));
         inputPanel.add(idLabel);
 
         JTextField idField = new JTextField();
@@ -185,9 +180,9 @@ public class PanelJoin extends JPanel {
                 return;
             }
 
-            boolean check = memberDAO.checkId(inputId);//중복확인
+            boolean check = memberDAO.checkId(inputId);
 
-            if(check) {//중복된 ID면 경고 메시지 출력
+            if(check) {
                 JOptionPane.showConfirmDialog(this, "이미 사용중인 ID입니다!!", "중복ID", JOptionPane.WARNING_MESSAGE);
                 return;
             }else{
@@ -196,11 +191,11 @@ public class PanelJoin extends JPanel {
             }
         });
         btnJoin.addActionListener(e -> {
-            String inputId = idField.getText();//입력한 아이디 
-            String inputPass = new String(passField.getPassword());//입력한 비밀번호
-            String inputPass2 = new String(passConfirmField.getPassword());//입력한 비밀번호확인 값
-            String inputName = nameField.getText();//입력한 이름
-            int inputAge = Integer.parseInt(ageField.getText());//입력한 나이
+            String inputId = idField.getText();
+            String inputPass = new String(passField.getPassword());
+            String inputPass2 = new String(passConfirmField.getPassword());
+            String inputName = nameField.getText();
+            int inputAge = Integer.parseInt(ageField.getText());
 
             // 입력란 공란 이슈
             if(inputId.isEmpty() || inputName.isEmpty() || inputPass.isEmpty() || inputPass2.isEmpty()) {
@@ -212,14 +207,14 @@ public class PanelJoin extends JPanel {
                 JOptionPane.showMessageDialog(this, "비밀번호가 일치하지 않습니다!!", "입력 오류", JOptionPane.WARNING_MESSAGE);
             }
 
-            // 비밀번호 해싱
+            // 비밀번호 암호화
             String hashedPassword = BCrypt.hashpw(inputPass, BCrypt.gensalt());
 
             // 회원가입
             JOptionPane.showMessageDialog(this, "회원가입이 완료되었습니다.", "회원가입", JOptionPane.INFORMATION_MESSAGE);
             MemberDTO joinMember = new MemberDTO(inputId, hashedPassword, inputName, inputAge);
-            memberDAO.insertMember(joinMember);//DB에 회원 저장
-            FrameBase.getInstance(new PanelLogin());//회원가입 완료후 로그인 
+            memberDAO.insertMember(joinMember);
+            FrameBase.getInstance(new PanelLogin());
         });
         // 뒤로가기 버튼 이벤트
         btnBack.addActionListener(e -> {

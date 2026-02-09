@@ -95,7 +95,7 @@ public class SeatDAO {
 
         try (Connection connection = getConnection()) {
 
-            connection.setAutoCommit(false); // 트랜잭션 시작 두 sql을 하나의 작업으로 처리하려는 로직
+            connection.setAutoCommit(false);
 
             // 1) 기존 좌석 비우기 (내가 앉아있는 자리만 비워야 함)
             try (PreparedStatement pstmt1 =

@@ -46,51 +46,46 @@ public class AdminDAO {
     }
     //음식 추가
     public void insertFood(FoodDTO f){
-    try (Connection conn = getConnection();
-        PreparedStatement pstmt = conn.prepareStatement("select food_idx from food where food_name = ? and food_price = ?")){
-            pstmt.setString(1, f.getFood_name());
-            pstmt.setInt(2, f.getFood_price());
-            try(ResultSet rs = pstmt.executeQuery()) {
-                if(rs.next()){
-                    int duplication = rs.getInt("food_idx");
-                   try(PreparedStatement pstmtUpdate = conn.prepareStatement("update food set food_stock = food_stock + ? where food_idx = ?") ){
-                       pstmtUpdate.setInt(1, f.getFood_stock());
-                       pstmtUpdate.setInt(2, duplication);
-                       pstmtUpdate.executeUpdate();
-                   } catch (Exception e) {
+        try (Connection conn = getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("select food_idx from food where food_name = ? and food_price = ?")){
+                pstmt.setString(1, f.getFood_name());
+                pstmt.setInt(2, f.getFood_price());
+                try(ResultSet rs = pstmt.executeQuery()) {
+                    if(rs.next()){ //추가하려는 음식이 이미 있을 때 수량 증가
+                        int duplication = rs.getInt("food_idx");
+                    try(PreparedStatement pstmtUpdate = conn.prepareStatement("update food set food_stock = food_stock + ? where food_idx = ?") ){
+                        pstmtUpdate.setInt(1, f.getFood_stock());
+                        pstmtUpdate.setInt(2, duplication);
+                        pstmtUpdate.executeUpdate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    }
+                    else{ //
+                        try (PreparedStatement pstmtInsert = conn.prepareStatement("insert into food(food_idx, food_name, food_price, food_stock) values(?,?,?,?)")) {
+                                pstmtInsert.setInt(1, f.getFood_idx());
+                                pstmtInsert.setString(2, f.getFood_name());
+                                pstmtInsert.setInt(3, f.getFood_price());
+                                pstmtInsert.setInt(4, f.getFood_stock());
+                                pstmtInsert.executeUpdate();
+                            }
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
-                   }
+                    throw new RuntimeException(e);
                 }
-                else{
-                    try (PreparedStatement pstmtInsert = conn.prepareStatement("insert into food(food_idx, food_name, food_price, food_stock) values(?,?,?,?)")) {
-                            pstmtInsert.setInt(1, f.getFood_idx());
-                            pstmtInsert.setString(2, f.getFood_name());
-                            pstmtInsert.setInt(3, f.getFood_price());
-                            pstmtInsert.setInt(4, f.getFood_stock());
-                            pstmtInsert.executeUpdate();
-                        }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-               
-                
-            }
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        throw new RuntimeException("DB 처리 중 오류 발생: " + e.getMessage());
-        
-    }
-     
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("DB 처리 중 오류 발생: " + e.getMessage());
+            
+        }
     } 
     //음식 삭제
-
-    
-    public void deletefood(FoodDTO f){
+    public void deletefood(FoodDTO food){
         try(Connection conn = getConnection();
             PreparedStatement psmts = conn.prepareStatement("delete from food where food_idx = ? ")) {
-            psmts.setInt(1, f.getFood_idx());
+            psmts.setInt(1, food.getFood_idx());
             psmts.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

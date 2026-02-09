@@ -9,10 +9,6 @@ import java.util.ArrayList;
 import vo.MemberDTO;
 import org.mindrot.jbcrypt.BCrypt;
 
-// 수겸
-// 사용자로그인, 회원가입 
-// 사용자 메인화면 
-// 사용자 보유머니 충전
 public class MemberDAO {
     String url = "jdbc:mysql://localhost:3306/yuls";
     String user = "root";
@@ -138,8 +134,7 @@ public class MemberDAO {
                 pstmt.setInt(5, members.getMem_idx());
                 
                 return pstmt.executeUpdate();
-                // 업데이트 성공하면 1을 return
-                // boolean대신 int 사용해야 ..
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -149,8 +144,7 @@ public class MemberDAO {
         String sql = "update member set mem_pass = ? where mem_idx = ?";
         
         String hashedPass = BCrypt.hashpw(pass, BCrypt.gensalt());
-        // BCrypt.checkpw(plainPassword, hashedPassword);
-        // 로그인할 때 사용하는 code
+        
         try(Connection conn = getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, hashedPass);
@@ -209,7 +203,7 @@ public class MemberDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, memIdx);
             try (ResultSet rs = pstmt.executeQuery()) {
-                return rs.next(); // Returns true if a member with mem_idx exists, false otherwise
+                return rs.next(); 
             }
         } catch (Exception e) {
             e.printStackTrace();

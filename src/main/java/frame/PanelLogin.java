@@ -26,7 +26,6 @@ public class PanelLogin extends JPanel {
     public PanelLogin() {
 
         MemberDAO memberDAO = new MemberDAO();
-        // 패널 기본 설정
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 800));
         setBackground(Color.WHITE);
@@ -43,7 +42,7 @@ public class PanelLogin extends JPanel {
         add(imgPanel, BorderLayout.NORTH);
 
         //============= 중단 입력 패널 ==============================
-        JPanel inputPanel = new JPanel(null); // 절대 위치 지정을 위해 null 레이아웃 사용
+        JPanel inputPanel = new JPanel(null);
         inputPanel.setPreferredSize(new Dimension(600, 150));
         inputPanel.setBackground(Color.WHITE);
 
@@ -51,7 +50,7 @@ public class PanelLogin extends JPanel {
         int fieldWidth = 250;
         int fieldHeight = 40;
         int labelWidth = 100;
-        int startX = (panelWidth - (labelWidth + fieldWidth)) / 2; // 중앙 정렬
+        int startX = (panelWidth - (labelWidth + fieldWidth)) / 2;
 
         // 아이디 라벨과 아이디 입력 필드
         JLabel idLabel = new JLabel("아이디");
@@ -77,7 +76,7 @@ public class PanelLogin extends JPanel {
         add(inputPanel, BorderLayout.CENTER);
 
         //================= 하단 버튼 패널 ====================
-        JPanel btnPanel = new JPanel(null); // 절대 위치 지정을 위해 null 레이아웃 사용
+        JPanel btnPanel = new JPanel(null);
         btnPanel.setPreferredSize(new Dimension(600, 170));
         btnPanel.setBackground(Color.WHITE);
 
@@ -131,10 +130,8 @@ public class PanelLogin extends JPanel {
                         JOptionPane.showMessageDialog(this, "시간을 충전해주세요!!", "시간충전", JOptionPane.INFORMATION_MESSAGE);
                         
                         PcCafeGUI pcCafeDialog = new PcCafeGUI(loginMember);
-                        pcCafeDialog.setModal(true); // Make it modal to block interaction with PanelLogin
-                        pcCafeDialog.setVisible(true); // This call will block until the dialog is closed
-
-                        // After PcCafeGUI is closed, re-fetch the member's data to get updated time
+                        pcCafeDialog.setModal(true); 
+                        pcCafeDialog.setVisible(true); 
                         MemberDTO updatedMember = null;
                         ArrayList<MemberDTO> allMembers = memberDAO.getAllMembers();
                         for (MemberDTO member : allMembers) {
@@ -145,10 +142,10 @@ public class PanelLogin extends JPanel {
                         }
                         
                         if (updatedMember != null && updatedMember.getMem_time() > 0) {
-                            FrameBase.getInstance(new PanelUser(updatedMember)); // Show PanelUser if time was charged
+                            FrameBase.getInstance(new PanelUser(updatedMember));
                         } else {
                             JOptionPane.showMessageDialog(this, "시간이 충전되지 않아 서비스 이용이 제한됩니다.", "안내", JOptionPane.WARNING_MESSAGE);
-                            FrameBase.getInstance(new PanelStart()); // Go back to start panel if time not charged
+                            FrameBase.getInstance(new PanelStart());
                         }
                     }
                     else{

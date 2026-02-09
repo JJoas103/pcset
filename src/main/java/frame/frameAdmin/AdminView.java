@@ -9,19 +9,19 @@ import javax.swing.table.DefaultTableModel;
 import db.LogDAO;
 import db.MemberDAO;
 import db.SeatDAO;
-import db.AdminDAO; // AdminDAO 임포트 추가
+import db.AdminDAO; 
 import vo.LogDTO;
 import vo.MemberDTO;
 import vo.SeatDTO;
 
 public class AdminView extends JDialog {
     
-    // DAO 객체 생성 (DB랑 대화할 애들)
+    
     MemberDAO mDao = new MemberDAO();
     SeatDAO sDao = new SeatDAO();
     LogDAO lDao = new LogDAO();
 
-    // 화면 구성요소
+    
     JTabbedPane tabPane;
     JTable memberTable;
     DefaultTableModel tableModel;
@@ -32,19 +32,18 @@ public class AdminView extends JDialog {
         setTitle("PC방 관리자 모드");
         setSize(1200, 800);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setLocationRelativeTo(null); // 화면 가운데 띄우기
+        setLocationRelativeTo(null); 
 
-        // 탭 메뉴 만들기
+        
         tabPane = new JTabbedPane();
         
         tabPane.addTab("1. 회원 관리", createMemberPanel());
         tabPane.addTab("2. 좌석 현황", createSeatPanel());
         tabPane.addTab("3. 매출 조회", createRevenuePanel());
-        tabPane.addTab("4. 음식 관리", AdminTestGUI.createFoodPanel(new AdminDAO())); // 수정된 부분
-        tabPane.addTab("5. 주문 관리", AdminTestGUI.createOrderPanel(new AdminDAO())); // 수정된 부분
-        tabPane.addTab("6. 시간/요금 관리", AdminTestGUI.createTimePanel(new AdminDAO())); // 수정된 부분
+        tabPane.addTab("4. 음식 관리", AdminTestGUI.createFoodPanel(new AdminDAO())); 
+        tabPane.addTab("5. 주문 관리", AdminTestGUI.createOrderPanel(new AdminDAO()));
+        tabPane.addTab("6. 시간/요금 관리", AdminTestGUI.createTimePanel(new AdminDAO()));
 
         add(tabPane);
         setVisible(true);
@@ -55,14 +54,13 @@ public class AdminView extends JDialog {
     }
 
     public void refreshMemberData() {
-        // 1. 기존 리스트 싹 비우기
+        
         tableModel.setRowCount(0);
         
-        // 2. DAO에게 "회원 다 가져와!" 시키기
+        
         ArrayList<MemberDTO> list = mDao.getAllMembers();
         
-        // 3. 화면에 한 줄씩 추가하기
-        for (MemberDTO m : list) {
+                for (MemberDTO m : list) {
             Object[] data = {
                 m.getMem_idx(), m.getMem_id(), m.getMem_name(), m.getMem_time(), m.getMem_age(), m.getMem_money()
             };
@@ -71,40 +69,38 @@ public class AdminView extends JDialog {
     }
 
     public void refreshSeatData() {
-        seatPanel.removeAll(); // 기존 버튼 싹 지우기
-            
-            // DB에서 좌석 정보 가져오기
-            ArrayList<SeatDTO> list = sDao.getAllSeats();
-            
-            // 버튼 50개 다시 그리기
-            for (SeatDTO s : list) {
-                JButton btn = new JButton(s.getSeatIdx() + "번");
+        seatPanel.removeAll();
+        
+        ArrayList<SeatDTO> list = sDao.getAllSeats();
+        
+        for (SeatDTO s : list) {
+            JButton btn = new JButton(s.getSeatIdx() + "번");
 
-                btn.setForeground(Color.WHITE); // 글자색은 무조건 흰색이 깔끔
-                btn.setFocusPainted(false); // 클릭했을 때 생기는 못생긴 테두리 제거
-                btn.setBorderPainted(false); // 버튼 외곽선 제거 (선택사항, 타일 느낌)
-                btn.setMargin(new Insets(0, 0, 0, 0)); // 상, 좌, 하, 우 여백을 0으로 설정
-                
-                // 상태가 1(사용중)이면 빨간색, 아니면 초록색
-                if (s.getStatus() == 1) {
-                    int age = s.getMemAge();
-                    if(age >= 19) {
-                        btn.setBackground(new Color(231, 76, 60));
-                        btn.setText("<html>"+s.getMemName()+"<br>호갱님</html>");
-                    } else {
-                        btn.setBackground(new Color(243, 156, 18)); 
-                        btn.setText("<html><center><b><small>청소년</small></b><br><br>" + s.getMemName() + "</center></html>");
-                        btn.setToolTipText(age + "세 - 22시 이후 퇴실 대상"); // 마우스 올리면 안내
-                    }
-                    
+            btn.setForeground(Color.WHITE);
+            btn.setFocusPainted(false);
+            btn.setBorderPainted(false);
+            btn.setMargin(new Insets(0, 0, 0, 0));   
+
+            // 상태가 1(사용중)이면 빨간색, 아니면 초록색
+            if (s.getStatus() == 1) {
+                int age = s.getMemAge();
+                if(age >= 19) {
+                    btn.setBackground(new Color(231, 76, 60));
+                    btn.setText("<html>"+s.getMemName()+"<br>호갱님</html>");
                 } else {
-                    btn.setBackground(new Color(46, 204, 113));
+                    btn.setBackground(new Color(243, 156, 18)); 
+                    btn.setText("<html><center><b><small>청소년</small></b><br><br>" + s.getMemName() + "</center></html>");
+                    btn.setToolTipText(age + "세 - 22시 이후 퇴실 대상"); // 마우스 올리면 안내
                 }
-                seatPanel.add(btn);
+                
+            } else {
+                btn.setBackground(new Color(46, 204, 113));
             }
-            
-            seatPanel.revalidate(); // 화면 갱신 (필수)
-            seatPanel.repaint();
+            seatPanel.add(btn);
+        }
+        
+        seatPanel.revalidate();
+        seatPanel.repaint();
     }
     // --------------------------------------------------------
     // 1. 회원 관리 패널 (테이블)
@@ -117,24 +113,25 @@ public class AdminView extends JDialog {
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column != 0; // idx 수정 막기
+                return column != 0;
             }
         };
         
         memberTable = new JTable(tableModel);
         JScrollPane scroll = new JScrollPane(memberTable);
 
-        JPanel bottomPanel = new JPanel(); // 기본 FlowLayout (가운데 정렬)
+        JPanel bottomPanel = new JPanel();
         JButton btnRefresh = new JButton("회원목록 새로고침");
         JButton btnSave = new JButton("수정사항 저장");
         JButton btnPass = new JButton("패스워드 변경");
         JButton btnRemove = new JButton("회원정보 삭제");
+
         // [버튼 클릭 이벤트] DB에서 회원 가져오기
         btnRefresh.addActionListener(e -> {
             refreshMemberData();
         });
         btnSave.addActionListener(e -> {
-            int row = memberTable.getSelectedRow(); // 행 가져오고
+            int row = memberTable.getSelectedRow();
             if (row == -1) {
                 JOptionPane.showMessageDialog(null, "행을 선택하세요..");
                 return;
@@ -152,7 +149,6 @@ public class AdminView extends JDialog {
                 m.setMem_time(time);
                 m.setMem_age(age);
                 m.setMem_money(money);
-                // 객체 불러오고.. 
 
                 int result = mDao.updateMember(m);
 
@@ -215,14 +211,14 @@ public class AdminView extends JDialog {
             }
         }
         });
-    bottomPanel.add(btnRefresh);
-    bottomPanel.add(btnSave);
-    bottomPanel.add(btnPass);
-    bottomPanel.add(btnRemove);
-    // 3. 레이아웃 배치
-    p.add(scroll, BorderLayout.CENTER);
-    p.add(bottomPanel, BorderLayout.SOUTH); // 버튼 모음 패널 배치
-        return p;
+        bottomPanel.add(btnRefresh);
+        bottomPanel.add(btnSave);
+        bottomPanel.add(btnPass);
+        bottomPanel.add(btnRemove);
+
+        p.add(scroll, BorderLayout.CENTER);
+        p.add(bottomPanel, BorderLayout.SOUTH); 
+            return p;
     }
 
     // --------------------------------------------------------
@@ -231,41 +227,32 @@ public class AdminView extends JDialog {
     public JPanel createSeatPanel() {
         JPanel p = new JPanel(new BorderLayout());
         
-        // [수정] 간격을 5px -> 10px로 늘림
         seatPanel = new JPanel(new GridLayout(5, 10, 10, 10)); 
-        
-        // [추가] 좌석 배경색을 약간 어둡게 깔아서 버튼 색을 강조 (다크모드 느낌)
         seatPanel.setBackground(new Color(230, 230, 230)); 
-        // 테두리 여백 주기 (상하좌우 20px)
         seatPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); 
 
         JButton btnRefresh = new JButton("좌석상태 새로고침");
-        // 새로고침 버튼도 예쁘게 (파란색 계열)
         btnRefresh.setBackground(new Color(52, 152, 219));
         btnRefresh.setForeground(Color.WHITE);
         btnRefresh.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-        btnRefresh.setPreferredSize(new Dimension(0, 50)); // 버튼 높이를 50px로 키움
+        btnRefresh.setPreferredSize(new Dimension(0, 50));
 
-        // 50개 좌석 5x10 배치
-        seatPanel = new JPanel(new GridLayout(5, 10, 5, 5)); // 간격 5px
-
+        seatPanel = new JPanel(new GridLayout(5, 10, 5, 5));
         // [버튼 클릭 이벤트]
         btnRefresh.addActionListener(e -> {
             refreshSeatData();
         });
-
         p.add(seatPanel, BorderLayout.CENTER);
         p.add(btnRefresh, BorderLayout.SOUTH);
         return p;
     }
 
-// --------------------------------------------------------
+    // --------------------------------------------------------
     // 3. 매출 조회 패널 (검증 로직 복구 + 테이블 적용)
     // --------------------------------------------------------
     public JPanel createRevenuePanel() {
         JPanel p = new JPanel(new BorderLayout());
 
-        // [상단] 컨트롤 패널
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         String[] years = {"2024", "2025", "2026"};
@@ -279,8 +266,7 @@ public class AdminView extends JDialog {
         JComboBox<String> yearCombo = new JComboBox<>(years);
         JComboBox<String> monthCombo = new JComboBox<>(months);
         JComboBox<String> dayCombo = new JComboBox<>(days);
-        
-        // 초기값: 현재 날짜 자동 선택
+
         LocalDate now = LocalDate.now();
         yearCombo.setSelectedItem(String.valueOf(now.getYear()));
         monthCombo.setSelectedItem(String.format("%02d", now.getMonthValue()));
@@ -298,9 +284,8 @@ public class AdminView extends JDialog {
         controlPanel.add(new JLabel("일"));
         controlPanel.add(btnSearch);
 
-        // [중앙] 테이블 (logModel 선언 필수!)
+        // [중앙] 테이블
         String[] headers = {"날짜/시간", "회원이름", "구분", "금액"};
-        // logModel을 여기서 만들어서 table에 끼워줍니다.
         DefaultTableModel logModel = new DefaultTableModel(headers, 0);
         JTable table = new JTable(logModel);
         
@@ -309,7 +294,7 @@ public class AdminView extends JDialog {
 
         // [하단] 합계 라벨
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        revenueLabel = new JLabel("조회된 결과 없음"); // 전역변수 활용
+        revenueLabel = new JLabel("조회된 결과 없음");
         revenueLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
         revenueLabel.setForeground(Color.BLACK);
         bottomPanel.add(revenueLabel);
@@ -322,7 +307,6 @@ public class AdminView extends JDialog {
             String m = (String) monthCombo.getSelectedItem();
             String d = (String) dayCombo.getSelectedItem();
 
-            // 1. [복구됨] 날짜 유효성 검사 (사용자님 기존 코드 + 개선)
             LocalDate today = LocalDate.now();
             try {
                 LocalDate selectedDate;
@@ -332,7 +316,7 @@ public class AdminView extends JDialog {
                     // 만약 선택한 달이 현재 달보다 미래라면? (예: 지금 2월인데 3월 조회)
                     if (selectedDate.isAfter(today.withDayOfMonth(1))) { // 오늘 날짜가 속한 달의 1일과 비교
                          JOptionPane.showMessageDialog(null, "미래의 날짜는 조회할 수 없습니다.");
-                         return; // 함수 종료 (밑에 실행 안 함)
+                         return; // 함수 종료
                     }
                 } else {
                     // 구체적인 날짜를 선택한 경우
@@ -343,7 +327,7 @@ public class AdminView extends JDialog {
                     }
                 }
             } catch (Exception e1) {
-                // 2월 30일 같은 존재하지 않는 날짜 예외 처리
+                // 존재하지 않는 날짜 예외 처리
                 JOptionPane.showMessageDialog(null, "존재하지 않는 날짜입니다.");
                 return; 
             }
@@ -356,11 +340,11 @@ public class AdminView extends JDialog {
                 targetDate = y + "-" + m + "-" + d;
             }
 
-            // 3. DAO 호출 (리스트 가져오기)
+            // 3. DAO 호출
             ArrayList<LogDTO> list = lDao.getLogList(targetDate);
             
             // 4. 테이블 리셋 및 데이터 채우기
-            logModel.setRowCount(0); // 싹 지우기
+            logModel.setRowCount(0);
             int totalSum = 0;
             int foodSum = 0;
             int timeSum = 0;

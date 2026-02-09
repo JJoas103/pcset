@@ -17,7 +17,6 @@ public class PanelFoodOrder extends JPanel{
     public PanelFoodOrder(MemberDTO loginMember) {
 
         MemberDAO memberDAO = new MemberDAO();
-        // 패널 기본 설정
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 800));
         setBackground(Color.WHITE);

@@ -25,7 +25,7 @@ public class AdminTestGUI extends JDialog{
     JTextField tfTimeHour, tfTimePrice;
 
     public AdminTestGUI() {
-        setTitle("PC방 관리자 기능 통합 테스트");
+        setTitle("PC방 관리자 기능");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -41,7 +41,6 @@ public class AdminTestGUI extends JDialog{
         refreshFoodTable();
         refreshOrderTable();
         refreshTimeTable();
-
         setVisible(true);
     }
 

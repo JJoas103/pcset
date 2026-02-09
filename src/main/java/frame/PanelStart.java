@@ -14,13 +14,11 @@ import javax.swing.JPanel;
 public class PanelStart extends JPanel {
 
     public PanelStart() {
-        // 패널 기본 설정 (PanelLogin/Join과 동일한 스타일)
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 800));
         setBackground(Color.WHITE);
 
         //============== 상단 이미지 패널 ==============================
-        // 이미지 크기를 다른 패널과 유사하게 조정하여 하단에 공간 확보
         ImageIcon originalIcon = new ImageIcon("src\\main\\java\\img\\mainImage.png");
         Image scaledImg = originalIcon.getImage().getScaledInstance(600, 550, Image.SCALE_SMOOTH);
         JLabel imgLabel = new JLabel(new ImageIcon(scaledImg));
@@ -31,24 +29,22 @@ public class PanelStart extends JPanel {
 
         add(imgPanel, BorderLayout.NORTH);
 
-        // 비어있는 중앙 패널 (공간 분리용)
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
         add(centerPanel, BorderLayout.CENTER);
 
         //================= 하단 버튼 패널 ====================
-        // 다른 패널과 동일한 스타일의 버튼 패널
         JPanel btnPanel = new JPanel(null);
-        btnPanel.setPreferredSize(new Dimension(600, 200)); // 버튼 영역 높이 확보
+        btnPanel.setPreferredSize(new Dimension(600, 200));
         btnPanel.setBackground(Color.WHITE);
 
         int panelWidth = 600;
         int buttonWidth = 150;
         int buttonHeight = 60;
-        int gap = 30; // 버튼 사이 간격
+        int gap = 30;
         int totalButtonWidth = (buttonWidth * 3) + (gap * 2);
         int btnStartX = (panelWidth - totalButtonWidth) / 2;
-        int buttonY = (200 - buttonHeight) / 2; // 버튼 패널의 세로 중앙에 위치
+        int buttonY = (200 - buttonHeight) / 2;
 
         // 로그인 버튼
         JButton btnLogin = new JButton("로그인");

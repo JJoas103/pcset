@@ -18,6 +18,7 @@ public class LogDAO {
         Connection connection = DriverManager.getConnection(url, user, pass);
         return connection;
     }
+
     // 날짜별 상세 내역 가져오기
     public ArrayList<LogDTO> getLogList(String date) {
         ArrayList<LogDTO> list = new ArrayList<>();
@@ -26,7 +27,7 @@ public class LogDAO {
                      "from log l " +
                      "join member m ON l.mem_idx = m.mem_idx " + 
                      "where l.log_date LIKE ? " +
-                     "order by l.log_date asc"; // 최신순 정렬
+                     "order by l.log_date asc";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -58,18 +59,11 @@ public class LogDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
         return list;
     }
+    // 매장 수익(해당 날짜의 총 수익합계)
     public int getIncome(String date) {
         int total = 0;
-        /*
-        String sql = "select sum(log_amount) " +
-                      "from log " + 
-                      "where date(log_date) = curdate()";
-                      */
-        
         String sql = "select sum(log_amount) from log where log_date like ?";
 
         try (Connection conn = getConnection();

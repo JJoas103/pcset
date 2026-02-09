@@ -19,6 +19,7 @@ public class FoodDAO {
         Connection connection =  DriverManager.getConnection(url, user, pass);
         return connection;
     }
+    //음식 list 보여주기
     public List<FoodDTO> showFood(){
         List<FoodDTO> list = new ArrayList<FoodDTO>();
         try(Connection conn = getConnection();

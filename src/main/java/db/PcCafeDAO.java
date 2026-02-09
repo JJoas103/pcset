@@ -4,8 +4,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
-
 import vo.MemberDTO;
 import vo.OrdersDTO;
 import vo.FoodDTO;
@@ -65,16 +63,6 @@ public class PcCafeDAO {
 
     // 3. 시간 충전
     public boolean chargeTime(int mem_idx, int addTime, int cost) {
-        MemberDTO mem = getMember(mem_idx);
-        //디버깅
-        if (mem != null) {
-                System.out.println("DEBUG: 검색된 회원 돈: " + mem.getMem_money());
-                System.out.println("DEBUG: 충전할 비용: " + cost);
-            } else {
-                System.out.println("DEBUG: ID로 getMember에서 회원을 찾을 수 없음: " + mem_idx);
-            }
-        //디버깅
-        if (mem == null || mem.getMem_money() < cost) return false;
 
         String sql = "UPDATE member SET mem_money = mem_money - ?, mem_time = mem_time + ? WHERE mem_idx = ?";
         try (Connection conn = getConnection();
@@ -87,39 +75,7 @@ public class PcCafeDAO {
             
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
-    public List<OrdersDTO> showOrderIdx(){ //모든 주문내역 
-            List<OrdersDTO> listIdx = new ArrayList<OrdersDTO>();
-            try(Connection conn = getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("select mem_idx, food_idx, seat_idx\r\n" + //
-                            "from orders o\r\n" + //
-                            "join food f\r\n" + //
-                            "on o.food_idx = f.food_idx\r\n" + //
-                            "join member m\r\n" + //
-                            "on o.mem_idx = m.mem_idx"  //
-                            )) {
-                try (ResultSet rs = pstmt.executeQuery()){
-                    while (rs.next()) {
-                        OrdersDTO order = new OrdersDTO();
-                        order.setMem_idx(rs.getInt("mem_idx"));
-                        order.setFood_idx(rs.getInt("food_idx"));
-                        order.setOd_idx(rs.getInt("od_idx"));
-                        order.setMem_name(rs.getString("mem_name"));
-                        order.setFood_name(rs.getString("food_name"));
-                        order.setFood_stock(rs.getInt("food_stock"));
-                        order.setSeat_idx(rs.getInt("seat_idx"));
-                        listIdx.add(order);
-                    }
-                    
-                } catch (Exception e) {
-                e.printStackTrace();
-                }
-                        
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return listIdx;
-        }
+    
     // 4. 음식 주문 (트랜잭션 적용)
     public String orderFood(int mem_Idx, int food_idx, int food_stock, int seat_idx) {
         Connection conn = null;
@@ -133,6 +89,7 @@ public class PcCafeDAO {
             PreparedStatement pstmtMem = conn.prepareStatement(memSql);
             pstmtMem.setInt(1, mem_Idx);
             ResultSet rsMem = pstmtMem.executeQuery();
+            
             //입력한 음식이름으로 음식가격과 음식수량 가져오기
             String foodSql = "SELECT f.food_price, f.food_stock FROM food f WHERE f.food_idx = ?";
             PreparedStatement pstmtFood = conn.prepareStatement(foodSql);
@@ -141,9 +98,9 @@ public class PcCafeDAO {
 
             if (!rsMem.next() || !rsFood.next()) return "정보 조회 오류";
 
-            int balance = rsMem.getInt("mem_money"); //보유금액
+            int balance = rsMem.getInt("mem_money");    //보유금액
             int price = rsFood.getInt("food_price");    //음식 가격
-            int stock = rsFood.getInt("food_stock"); //보유 재고 수량
+            int stock = rsFood.getInt("food_stock");    //보유 재고 수량
             int totalPrice = price * food_stock; //음식금액 = 음식 가격 * 주문 수량
 
             if (stock < food_stock) return "재고 부족";
@@ -179,4 +136,38 @@ public class PcCafeDAO {
             try { if (conn != null) conn.close(); } catch (SQLException ex) {}
         }
     }
+    //모든 주문내역     
+    public List<OrdersDTO> showOrderIdx(){ 
+            List<OrdersDTO> listIdx = new ArrayList<OrdersDTO>();
+            try(Connection conn = getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("select mem_idx, food_idx, seat_idx\r\n" + //
+                            "from orders o\r\n" + //
+                            "join food f\r\n" + //
+                            "on o.food_idx = f.food_idx\r\n" + //
+                            "join member m\r\n" + //
+                            "on o.mem_idx = m.mem_idx"  //
+                            )) {
+                try (ResultSet rs = pstmt.executeQuery()){
+                    while (rs.next()) {
+                        OrdersDTO order = new OrdersDTO();
+                        order.setMem_idx(rs.getInt("mem_idx"));
+                        order.setFood_idx(rs.getInt("food_idx"));
+                        order.setOd_idx(rs.getInt("od_idx"));
+                        order.setMem_name(rs.getString("mem_name"));
+                        order.setFood_name(rs.getString("food_name"));
+                        order.setFood_stock(rs.getInt("food_stock"));
+                        order.setSeat_idx(rs.getInt("seat_idx"));
+                        listIdx.add(order);
+                    }
+                    
+                } catch (Exception e) {
+                e.printStackTrace();
+                }
+                        
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return listIdx;
+        }
 }

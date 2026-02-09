@@ -38,7 +38,8 @@ public class TimeDAO {
             e.printStackTrace();
         }
         return list;
-    }//가격 변경
+    }
+    //가격 변경
     public void updateTimePrice(int hour, int newprice){
         try (Connection conn = getConnection();
             PreparedStatement pstmt = conn.prepareStatement("update time_menu SET price = ? where hour = ?")){
@@ -61,17 +62,17 @@ public class TimeDAO {
             e.printStackTrace();
            
         } 
-    }  //시간 가격 추가
+    }  
+    //시간 가격 추가
     public void inserthour(int hour, int price){
-   try(Connection conn = getConnection();
-    PreparedStatement pstmt = conn.prepareStatement("insert into time_menu(hour, price) values(?,?)")) {
-        pstmt.setInt(1, hour);
-        pstmt.setInt(2, price);
-        pstmt.executeUpdate();
-    
-   } catch (Exception e) {
-    e.printStackTrace();
-   }//시간을 추가
-    
-}
+        try(Connection conn = getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("insert into time_menu(hour, price) values(?,?)")) {
+                pstmt.setInt(1, hour);
+                pstmt.setInt(2, price);
+                pstmt.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
