@@ -28,9 +28,9 @@ public class FoodDAO {
                 while (rs.next()) {
                    FoodDTO food = new FoodDTO();
                    food.setFood_idx(rs.getInt("food_idx"));
-                   food.setFood_name(rs.getString("foo_name"));
+                   food.setFood_name(rs.getString("food_name"));
                    food.setFood_price(rs.getInt("food_price"));
-                   food.setFood_stock(rs.getInt("foo_stock"));
+                   food.setFood_stock(rs.getInt("food_stock"));
                    list.add(food);
                 }
             } catch (Exception e) {
@@ -66,10 +66,10 @@ public class FoodDAO {
     public void updateFood(FoodDTO f){
         try(Connection conn = getConnection();
            PreparedStatement psmts = conn.prepareStatement("update food set food_name = ?, food_price = ?, food_stock = ? where food_idx = ?")){
-            psmts.setString(1, "food_name");
-            psmts.setString(2, "food_price");
-            psmts.setString(3, "food_stock");
-            psmts.setString(4, "food idx");
+            psmts.setString(1, f.getFood_name());
+            psmts.setInt(2, f.getFood_price());
+            psmts.setInt(3, f.getFood_stock());
+            psmts.setInt(4, f.getFood_idx());
             psmts.executeUpdate();
             
         } catch (Exception e) {

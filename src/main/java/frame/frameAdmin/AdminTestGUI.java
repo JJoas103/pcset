@@ -1,6 +1,10 @@
 package frame.frameAdmin; // 패키지명 확인
 
 import db.AdminDAO;
+import db.FoodDAO; // Add FoodDAO import
+import db.OrderDAO; // Add OrderDAO import
+import db.TimeDAO; // Add TimeDAO import
+
 import vo.FoodDTO;
 import vo.OrdersDTO;
 import vo.TimeDTO;
@@ -16,6 +20,9 @@ import java.util.Vector;
 public class AdminTestGUI extends JDialog{
 
     AdminDAO dao = new AdminDAO();
+    FoodDAO foodDao = new FoodDAO(); // Instantiate FoodDAO
+    OrderDAO orderDao = new OrderDAO(); // Instantiate OrderDAO
+    TimeDAO timeDao = new TimeDAO(); // Instantiate TimeDAO
     JTabbedPane tabbedPane;
 
     // 변수 선언
@@ -31,9 +38,9 @@ public class AdminTestGUI extends JDialog{
         setLocationRelativeTo(null);
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("1. 음식 관리", createFoodPanel(dao));
-        tabbedPane.addTab("2. 주문 관리", createOrderPanel(dao));
-        tabbedPane.addTab("3. 시간/요금 관리", createTimePanel(dao));
+        tabbedPane.addTab("1. 음식 관리", createFoodPanel(foodDao)); // Pass foodDao instance
+        tabbedPane.addTab("2. 주문 관리", createOrderPanel(orderDao));
+        tabbedPane.addTab("3. 시간/요금 관리", createTimePanel(timeDao)); // Pass timeDao instance
 
         add(tabbedPane);
 
@@ -45,7 +52,7 @@ public class AdminTestGUI extends JDialog{
     }
 
     // 1. 음식 관리 패널
-    public static JPanel createFoodPanel(AdminDAO adminDao) {
+    public static JPanel createFoodPanel(FoodDAO foodDao) { // Changed parameter to FoodDAO
         JPanel panel = new JPanel(new BorderLayout());
 
         String[] headers = {"번호(idx)", "음식명", "가격", "재고"};
@@ -79,7 +86,7 @@ public class AdminTestGUI extends JDialog{
         // 로컬 refreshFoodTable 메소드
         Runnable refreshFoodTable = () -> {
             foodModel.setRowCount(0);
-            List<FoodDTO> list = adminDao.showFood();
+            List<FoodDTO> list = foodDao.showFood(); // Changed from adminDao to foodDao
             for (FoodDTO f : list) {
                 Vector<Object> row = new Vector<>();
                 row.add(f.getFood_idx());
@@ -121,7 +128,7 @@ public class AdminTestGUI extends JDialog{
                 f.setFood_price(Integer.parseInt(tfFoodPrice.getText()));
                 f.setFood_stock(Integer.parseInt(tfFoodStock.getText()));
 
-                adminDao.insertFood(f);       
+                foodDao.insertFood(f); // Changed from adminDao to foodDao
                 refreshFoodTable.run();      
                 clearFoodInputs.run();       
                 JOptionPane.showMessageDialog(null, "처리 완료!");
@@ -141,7 +148,7 @@ public class AdminTestGUI extends JDialog{
                 f.setFood_name(tfFoodName.getText());
                 f.setFood_price(Integer.parseInt(tfFoodPrice.getText()));
                 f.setFood_stock(Integer.parseInt(tfFoodStock.getText()));
-                adminDao.updateFood(f);
+                foodDao.updateFood(f); // Changed from adminDao to foodDao
                 refreshFoodTable.run(); clearFoodInputs.run();
                 JOptionPane.showMessageDialog(null, "수정 완료");
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "수정할 음식을 선택하세요"); }
@@ -152,7 +159,7 @@ public class AdminTestGUI extends JDialog{
             try {
                 FoodDTO f = new FoodDTO();
                 f.setFood_idx(Integer.parseInt(tfFoodIdx.getText()));
-                adminDao.deletefood(f);
+                foodDao.deletefood(f); // Changed from adminDao to foodDao
                 refreshFoodTable.run(); clearFoodInputs.run();
                 JOptionPane.showMessageDialog(null, "삭제 완료");
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "삭제할 음식을 선택하세요"); }
@@ -163,7 +170,7 @@ public class AdminTestGUI extends JDialog{
     }
 
     // 2. 주문 관리 패널
-    public static JPanel createOrderPanel(AdminDAO adminDao) {
+    public static JPanel createOrderPanel(OrderDAO orderDao) {
         JPanel panel = new JPanel(new BorderLayout());
         String[] headers = {"주문번호", "회원명", "음식명", "남은재고", "좌석번호"};
         DefaultTableModel orderModel = new DefaultTableModel(headers, 0);
@@ -179,7 +186,7 @@ public class AdminTestGUI extends JDialog{
         // 로컬 refreshOrderTable 메소드
         Runnable refreshOrderTable = () -> {
             orderModel.setRowCount(0);
-            List<OrdersDTO> list = adminDao.showOrder();
+            List<OrdersDTO> list = orderDao.showOrder();
             for (OrdersDTO o : list) {
                 Vector<Object> row = new Vector<>();
                 row.add(o.getOd_idx());
@@ -198,7 +205,7 @@ public class AdminTestGUI extends JDialog{
             int row = orderTable.getSelectedRow();
             if (row == -1) { JOptionPane.showMessageDialog(null, "선택해주세요"); return; }
             int odIdx = Integer.parseInt(orderModel.getValueAt(row, 0).toString());
-            adminDao.deleteOrder(odIdx);
+            orderDao.deleteOrder(odIdx);
             refreshOrderTable.run();
             JOptionPane.showMessageDialog(null, "완료!");
         });
@@ -207,7 +214,7 @@ public class AdminTestGUI extends JDialog{
     }
 
     // 3. 시간 관리 패널
-    public static JPanel createTimePanel(AdminDAO adminDao) {
+    public static JPanel createTimePanel(TimeDAO timeDao) { // Changed parameter to TimeDAO
         JPanel panel = new JPanel(new BorderLayout());
         String[] headers = {"시간", "가격"};
         DefaultTableModel timeModel = new DefaultTableModel(headers, 0);
@@ -231,7 +238,7 @@ public class AdminTestGUI extends JDialog{
         // 로컬 refreshTimeTable 메소드
         Runnable refreshTimeTable = () -> {
             timeModel.setRowCount(0);
-            List<TimeDTO> list = adminDao.getAllTime();
+            List<TimeDTO> list = timeDao.getAllTime(); // Changed from adminDao to timeDao
             for (TimeDTO t : list) {
                 Vector<Object> row = new Vector<>();
                 row.add(t.getHour());
@@ -253,19 +260,19 @@ public class AdminTestGUI extends JDialog{
 
         btnAdd.addActionListener(e -> {
             try {
-                adminDao.inserthour(Integer.parseInt(tfTimeHour.getText()), Integer.parseInt(tfTimePrice.getText()));
+                timeDao.inserthour(Integer.parseInt(tfTimeHour.getText()), Integer.parseInt(tfTimePrice.getText())); // Changed from adminDao to timeDao
                 refreshTimeTable.run(); tfTimeHour.setText(""); tfTimePrice.setText("");
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "추가 실패: " + ex.getMessage()); }
         });
         btnUpd.addActionListener(e -> {
             try {
-                adminDao.updateTimePrice(Integer.parseInt(tfTimeHour.getText()), Integer.parseInt(tfTimePrice.getText()));
+                timeDao.updateTimePrice(Integer.parseInt(tfTimeHour.getText()), Integer.parseInt(tfTimePrice.getText())); // Changed from adminDao to timeDao
                 refreshTimeTable.run();
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "수정 실패: " + ex.getMessage()); }
         });
         btnDel.addActionListener(e -> {
             try {
-                adminDao.deleteTime(Integer.parseInt(tfTimeHour.getText()));
+                timeDao.deleteTime(Integer.parseInt(tfTimeHour.getText())); // Changed from adminDao to timeDao
                 refreshTimeTable.run(); tfTimeHour.setText(""); tfTimePrice.setText("");
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "삭제 실패: " + ex.getMessage()); }
         });
@@ -276,7 +283,7 @@ public class AdminTestGUI extends JDialog{
     // 새로고침 메서드들
     public void refreshFoodTable() {
         foodModel.setRowCount(0);
-        List<FoodDTO> list = dao.showFood();
+        List<FoodDTO> list = foodDao.showFood(); // Changed from dao to foodDao
         for (FoodDTO f : list) {
             Vector<Object> row = new Vector<>();
             row.add(f.getFood_idx());
@@ -288,7 +295,7 @@ public class AdminTestGUI extends JDialog{
     }
     public void refreshOrderTable() {
         orderModel.setRowCount(0);
-        List<OrdersDTO> list = dao.showOrder();
+        List<OrdersDTO> list = orderDao.showOrder();
         for (OrdersDTO o : list) {
             Vector<Object> row = new Vector<>();
             row.add(o.getOd_idx());
@@ -301,7 +308,7 @@ public class AdminTestGUI extends JDialog{
     }
     public void refreshTimeTable() {
         timeModel.setRowCount(0);
-        List<TimeDTO> list = dao.getAllTime();
+        List<TimeDTO> list = timeDao.getAllTime(); // Changed from dao to timeDao
         for (TimeDTO t : list) {
             Vector<Object> row = new Vector<>();
             row.add(t.getHour());

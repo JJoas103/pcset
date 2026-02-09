@@ -1,6 +1,7 @@
 package frame.frameAdmin;
 
 import java.awt.*;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -8,8 +9,11 @@ import javax.swing.table.DefaultTableModel;
 
 import db.LogDAO;
 import db.MemberDAO;
+import db.OrderDAO;
 import db.SeatDAO;
-import db.AdminDAO; 
+import db.TimeDAO;
+import db.AdminDAO;
+import db.FoodDAO;
 import vo.LogDTO;
 import vo.MemberDTO;
 import vo.SeatDTO;
@@ -20,8 +24,9 @@ public class AdminView extends JDialog {
     MemberDAO mDao = new MemberDAO();
     SeatDAO sDao = new SeatDAO();
     LogDAO lDao = new LogDAO();
-
-    
+    FoodDAO fDao = new FoodDAO();
+    TimeDAO tDao = new TimeDAO();
+    OrderDAO oDao = new OrderDAO();
     JTabbedPane tabPane;
     JTable memberTable;
     DefaultTableModel tableModel;
@@ -41,9 +46,9 @@ public class AdminView extends JDialog {
         tabPane.addTab("1. 회원 관리", createMemberPanel());
         tabPane.addTab("2. 좌석 현황", createSeatPanel());
         tabPane.addTab("3. 매출 조회", createRevenuePanel());
-        tabPane.addTab("4. 음식 관리", AdminTestGUI.createFoodPanel(new AdminDAO())); 
-        tabPane.addTab("5. 주문 관리", AdminTestGUI.createOrderPanel(new AdminDAO()));
-        tabPane.addTab("6. 시간/요금 관리", AdminTestGUI.createTimePanel(new AdminDAO()));
+        tabPane.addTab("4. 음식 관리", AdminTestGUI.createFoodPanel(new FoodDAO())); 
+        tabPane.addTab("5. 주문 관리", AdminTestGUI.createOrderPanel(oDao));
+        tabPane.addTab("6. 시간/요금 관리", AdminTestGUI.createTimePanel(new TimeDAO()));
 
         add(tabPane);
         setVisible(true);
