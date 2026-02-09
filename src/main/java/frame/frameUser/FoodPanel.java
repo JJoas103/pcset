@@ -3,9 +3,8 @@ package frame.frameUser;
 import javax.swing.*;                                                                                                                  
 import javax.swing.table.DefaultTableModel;
 
-import db.PcCafeDAO;
-import db.SeatDAO; // SeatDAO 임포트 추가
-import db.LogDAO; // LogDAO 임포트 추가
+import db.SeatDAO; 
+import db.LogDAO; 
 
 import java.awt.*;
 import java.util.List;
@@ -15,16 +14,16 @@ import vo.MemberDTO;
 import vo.OrdersDTO;
 
 public class FoodPanel extends JPanel {
-    PcCafeGUI mainFrame; // Make it non-final
-    MemberDTO loginMember; // Store loginMember
+    UserView mainFrame; 
+    MemberDTO loginMember;
     DefaultTableModel tableModel;
     JTable foodTable;
-    private SeatDAO seatDAO = new SeatDAO(); // SeatDAO 인스턴스 생성
-    private LogDAO logDAO = new LogDAO(); // LogDAO 인스턴스 생성
+    private SeatDAO seatDAO = new SeatDAO(); 
+    private LogDAO logDAO = new LogDAO();
 
-    public FoodPanel(PcCafeGUI mainFrame, MemberDTO loginMember) {
-        this.mainFrame = mainFrame; // Assign mainFrame
-        this.loginMember = loginMember; // Assign loginMember
+    public FoodPanel(UserView mainFrame, MemberDTO loginMember) {
+        this.mainFrame = mainFrame; 
+        this.loginMember = loginMember;
         setLayout(new BorderLayout());
         // 테이블 구성
         String[] colNames = {"ID", "음식 이름", "가격", "남은 수량"};
@@ -73,7 +72,7 @@ public class FoodPanel extends JPanel {
 
                 if (result.equals("SUCCESS")) {
                     JOptionPane.showMessageDialog(this, "주문 성공!");
-                    logDAO.insertLog(loginMember.getMem_idx(), 2, foodPrice * qty); // 음식 주문 로그 기록 (log_type: 2)
+                    logDAO.insertLog(loginMember.getMem_idx(), 2, foodPrice * qty); // logType: 2 -> 음식주문 로그에 기록
                     mainFrame.refreshUserInfo();
                     loadFoodList(); // 재고 갱신
                 } else {

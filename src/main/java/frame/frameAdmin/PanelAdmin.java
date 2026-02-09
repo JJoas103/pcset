@@ -39,7 +39,7 @@ public class PanelAdmin extends JPanel{
 
         //============= 하단 버튼 패널 (SOUTH) ==============================
         JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new GridLayout(1, 3, 10, 10));
+        btnPanel.setLayout(new GridLayout(1, 2, 10, 10)); // Changed from 1,3 to 1,2
         btnPanel.setPreferredSize(new Dimension(600, 300)); 
         btnPanel.setBackground(Color.WHITE);
 
@@ -47,7 +47,7 @@ public class PanelAdmin extends JPanel{
         Dimension buttonSize = new Dimension(150, 60);
         // 이용시간가격변경, 좌석확인, 로그아웃
         //버튼 1
-        JButton button1 = new JButton("이용시간가격변경");
+        JButton button1 = new JButton("관리자 메뉴"); // Renamed button1
         button1.setFont(buttonFont);
         button1.setPreferredSize(buttonSize); 
         button1.setBackground(new Color(240, 240, 240));
@@ -57,16 +57,7 @@ public class PanelAdmin extends JPanel{
         
         btnPanel.add(button1);
 
-        //버튼 2
-        JButton button2 = new JButton("좌석확인");
-        button2.setFont(buttonFont);
-        button2.setPreferredSize(buttonSize); 
-        button2.setBackground(new Color(240, 240, 240));
-        button2.setForeground(Color.BLACK);
-        button2.setFocusPainted(false);
-        button2.setBorderPainted(false);
-        
-        btnPanel.add(button2);
+        //버튼 2 (삭제됨)
 
         //버튼 3
         JButton button3 = new JButton("로그아웃");
@@ -85,11 +76,7 @@ public class PanelAdmin extends JPanel{
 
         // 이용시간가격변경, 좌석확인, 로그아웃
         button1.addActionListener(e -> {
-            new AdminView();
-        });
-        //사장의 좌석상태 확인
-        button2.addActionListener(e -> {
-           new AdminSeat(loginMember);
+            new AdminView(); // Opens comprehensive AdminView
         });
         
         //뒤로가기
@@ -98,4 +85,3 @@ public class PanelAdmin extends JPanel{
         }); 
     }
 }
-// 좌석현황 합칠지 어떻게할지 다시 확인 AdminView()와 AdminSeat()이 겹침

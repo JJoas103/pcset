@@ -195,16 +195,26 @@ public class PanelJoin extends JPanel {
             String inputPass = new String(passField.getPassword());
             String inputPass2 = new String(passConfirmField.getPassword());
             String inputName = nameField.getText();
-            int inputAge = Integer.parseInt(ageField.getText());
+            String ageText = ageField.getText(); 
 
             // 입력란 공란 이슈
-            if(inputId.isEmpty() || inputName.isEmpty() || inputPass.isEmpty() || inputPass2.isEmpty()) {
+            if(inputId.isEmpty() || inputName.isEmpty() || inputPass.isEmpty() || inputPass2.isEmpty() || ageText.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "모든 항목을 입력하세요!!", "입력 오류", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+
+            int inputAge;
+            try {
+                inputAge = Integer.parseInt(ageText);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "나이는 숫자로 입력하세요!!", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             // 비밀번호 불일치
             if(!inputPass.equals(inputPass2)) {
                 JOptionPane.showMessageDialog(this, "비밀번호가 일치하지 않습니다!!", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                return; 
             }
 
             // 비밀번호 암호화

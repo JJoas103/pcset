@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 import db.MemberDAO;
 import frame.frameAdmin.PanelAdmin;
 import frame.frameUser.PanelUser;
-import frame.frameUser.PcCafeGUI;
+import frame.frameUser.UserView;
 import vo.MemberDTO;
 
 public class PanelLogin extends JPanel {
@@ -129,7 +129,7 @@ public class PanelLogin extends JPanel {
                     if(loginMember.getMem_time() == 0) {
                         JOptionPane.showMessageDialog(this, "시간을 충전해주세요!!", "시간충전", JOptionPane.INFORMATION_MESSAGE);
                         
-                        PcCafeGUI pcCafeDialog = new PcCafeGUI(loginMember);
+                        UserView pcCafeDialog = new UserView(loginMember);
                         pcCafeDialog.setModal(true); 
                         pcCafeDialog.setVisible(true); 
                         MemberDTO updatedMember = null;
