@@ -19,7 +19,7 @@ public class AdminOrderPanel extends JPanel {
         this.orderDao = orderDao;
         setLayout(new BorderLayout());
 
-        String[] headers = {"주문번호", "회원명", "음식명", "남은재고", "좌석번호,"};
+        String[] headers = {"주문번호", "회원명", "음식명", "남은재고", "좌석번호","수량"};
         orderModel = new DefaultTableModel(headers, 0);
         orderTable = new JTable(orderModel);
         add(new JScrollPane(orderTable), BorderLayout.CENTER);

@@ -67,7 +67,7 @@ public class PcCafeDAO extends BaseDAO{
     }
     
     // 4. 음식 주문 (트랜잭션 적용)
-    public String orderFood(int mem_Idx, int food_idx, int food_stock, int seat_idx) {
+    public String orderFood(int mem_Idx, int food_idx, int qty, int seat_idx) {
         Connection conn = null;
         try {
             conn = getConnection();
@@ -90,10 +90,10 @@ public class PcCafeDAO extends BaseDAO{
 
             int balance = rsMem.getInt("mem_money");    //보유금액
             int price = rsFood.getInt("food_price");    //음식 가격
-            int stock = rsFood.getInt("food_stock");    //보유 재고 수량
-            int totalPrice = price * food_stock; //음식금액 = 음식 가격 * 주문 수량
+            int food_stock = rsFood.getInt("food_stock");    //보유 재고 수량
+            int totalPrice = price * qty; //음식금액 = 음식 가격 * 주문 수량
 
-            if (stock < food_stock) return "재고 부족";
+            if (food_stock < qty) return "재고 부족";
             if (balance < totalPrice) return "잔액 부족";
 
             
@@ -106,7 +106,7 @@ public class PcCafeDAO extends BaseDAO{
             //수량감소
             String updateFood = "update food set food_stock = food_stock - ? where food_idx = ?";
             PreparedStatement upFoodStmt = conn.prepareStatement(updateFood);
-            upFoodStmt.setInt(1, food_stock);
+            upFoodStmt.setInt(1, qty);
             upFoodStmt.setInt(2, food_idx);
             upFoodStmt.executeUpdate();
             String insertOrder = "insert into orders(mem_idx, seat_idx, food_idx) values (?, ?, ?)";

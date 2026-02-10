@@ -6,8 +6,6 @@ import vo.SeatDTO;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener; // Added for clarity
-import java.util.ArrayList;
 import java.util.List;
 
 public class AdminSeatPanel extends JPanel {
@@ -22,11 +20,11 @@ public class AdminSeatPanel extends JPanel {
         this.sDao = sDao;
         this.mDao = mDao;
         setLayout(new BorderLayout());
-        setBackground(Color.LIGHT_GRAY); // Mimic UserView background
+        setBackground(Color.LIGHT_GRAY); 
 
         // ===== 상단: memIdx 입력 + 새로고침 =====
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        top.add(new JLabel("memIdx:"));
+        top.add(new JLabel("회원번호:"));
 
         tfMemIdx = new JTextField(10);
         top.add(tfMemIdx);
@@ -35,21 +33,21 @@ public class AdminSeatPanel extends JPanel {
         btnRefresh.addActionListener(e -> refreshSeats());
         top.add(btnRefresh);
 
-        lblInfo = new JLabel("빈좌석 클릭: 착석/이동 자동 처리. 사용중 좌석 클릭: 퇴실/강퇴 처리."); // Updated info text
+        lblInfo = new JLabel("빈좌석 클릭: 착석/이동 자동 처리. 사용중 좌석 클릭: 퇴실/강퇴 처리."); 
         top.add(lblInfo);
         
         // ===== 가운데: 좌석 그리드 =====
         seatPanelGrid = new JPanel(new GridLayout(5, 10, 8, 8));
         seatPanelGrid.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        seatPanelGrid.setBackground(Color.LIGHT_GRAY); // Mimic UserView background
+        seatPanelGrid.setBackground(Color.LIGHT_GRAY); 
 
         add(top, BorderLayout.NORTH);
         add(seatPanelGrid, BorderLayout.CENTER);
         
-        refreshSeats(); // Initial data load
+        refreshSeats(); 
     }
 
-    private void refreshSeats() { // Renamed from refreshSeatData to refreshSeats to match UserView
+    private void refreshSeats() { 
         seatPanelGrid.removeAll();
 
         List<SeatDTO> seats = sDao.getAllSeats();
@@ -68,52 +66,45 @@ public class AdminSeatPanel extends JPanel {
         btn.setOpaque(true);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setText(seatIdx + "번"); // Default text
+        btn.setText(seatIdx + "번"); 
 
-        // UI for occupied/empty seats (design mimic UserView)
-        if (s.getStatus() == 1) { // Occupied
+      
+        if (s.getStatus() == 1) { 
             btn.setBackground(Color.RED);
             btn.setForeground(Color.WHITE);
-            // Optionally show member name on button for admin
+          
             btn.setText("<html>"+ seatIdx + "번<br>" + s.getMemName() + "</html>");
-        } else { // Empty
+        } else { 
             btn.setBackground(Color.GREEN);
             btn.setForeground(Color.BLACK);
             btn.setText(seatIdx + " 빈좌석");
         }
-
-        // Attach a single listener for all seat buttons
         btn.addActionListener(e -> onSeatButtonClicked(s, seatIdx));
-
         return btn;
     }
 
     private void onSeatButtonClicked(SeatDTO s, int clickedSeatIdx) {
         Integer memIdxInput = parseMemIdx();
 
-        // Admin functionality (evict/move/sit)
-        // Scenario 1: memIdx is NOT provided in the input field
+        // memIdx를 입력 안했을때.
         if (memIdxInput == null) {
-            // If admin clicks an occupied seat without memIdx, maybe just show info or do nothing
-            // If admin clicks an empty seat without memIdx, do nothing
-            JOptionPane.showMessageDialog(this, "좌석 조작을 위해 memIdx를 입력하세요.");
+            JOptionPane.showMessageDialog(this, "좌석 조작을 위해 회원번호를 입력하세요.");
             return;
         }
 
-        // Scenario 2: memIdx IS provided in the input field
-        // Validate member existence
+        // memIdx를 입력받았지만 존재하지 않을때.
         if (!mDao.isMemberExist(memIdxInput)) {
             JOptionPane.showMessageDialog(this, "존재하지 않는 회원 번호(memIdx)입니다.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        // Find if the memIdxInput is already seated
+        // 입력받은 memIdx가 좌석에 존재하는지 확인
         int fromSeat = sDao.findSeat(memIdxInput);
 
-        // Action depends on clicked seat status and member's current seat
-        if (s.getStatus() == 1) { // Clicked an occupied seat (admin wants to evict/move this member)
-            if (fromSeat == clickedSeatIdx) { // If the member in memIdxInput is on THIS seat
-                // Option to evict/checkout this member from this seat
+        //사용중인 좌석을 클릭했을때
+        if (s.getStatus() == 1) { 
+            // 사용중인 좌석을 클릭했는데 입력받은 memIdx일때.(강퇴로직)
+            if (fromSeat == clickedSeatIdx) {
                 int ok = JOptionPane.showConfirmDialog(
                         this,
                         memIdxInput + " 회원을 " + clickedSeatIdx + "번 좌석에서 퇴실(강퇴)시킬까요?",
@@ -121,17 +112,15 @@ public class AdminSeatPanel extends JPanel {
                         JOptionPane.YES_NO_OPTION
                 );
                 if (ok == JOptionPane.YES_OPTION) {
-                    boolean success = sDao.leaveSeat(memIdxInput); // leaveSeat uses memIdx
+                    boolean success = sDao.leaveSeat(memIdxInput);
                     if (!success) JOptionPane.showMessageDialog(this, "퇴실 실패(상태가 바뀌었을 수 있어요).");
                     refreshSeats();
                 }
-            } else { // Clicked an occupied seat, but the memIdxInput is not on it, or on another seat
+            } else { 
                 JOptionPane.showMessageDialog(this, "선택한 회원(" + memIdxInput + ")은 " + clickedSeatIdx + "번 좌석에 없습니다.", "정보", JOptionPane.INFORMATION_MESSAGE);
-                // Optionally, could allow moving another user, but that's more complex
             }
-        } else { // Clicked an empty seat (admin wants to sit/move memIdxInput to this seat)
-            // This logic is mostly what was in onEmptySeatClicked
-            if (fromSeat == 0) { // Member not seated, try to sit
+        } else { //빈좌석 클릭
+            if (fromSeat == 0) { 
                 int ok = JOptionPane.showConfirmDialog(
                         this,
                         memIdxInput + " 회원을 " + clickedSeatIdx + "번 좌석에 착석시킬까요?",
@@ -143,7 +132,7 @@ public class AdminSeatPanel extends JPanel {
                     if (!success) JOptionPane.showMessageDialog(this, "착석 실패(이미 누가 앉았을 수 있어요).");
                     refreshSeats();
                 }
-            } else { // Member is seated elsewhere, try to move
+            } else {
                 int ok = JOptionPane.showConfirmDialog(
                         this,
                         fromSeat + "번 → " + clickedSeatIdx + "번으로 이동할까요?",

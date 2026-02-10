@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public class AdminRevenuePanel extends JPanel {
 
     private LogDAO lDao;
-    private JLabel revenueLabel; // Declared here
-    private DefaultTableModel logModel; // Declared here
+    private JLabel revenueLabel; 
+    private DefaultTableModel logModel; 
 
     public AdminRevenuePanel(LogDAO lDao) {
         this.lDao = lDao;

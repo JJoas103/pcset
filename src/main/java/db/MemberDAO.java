@@ -35,7 +35,7 @@ public class MemberDAO extends BaseDAO{
                             loginMember = new MemberDTO();
                             loginMember.setMem_idx(rs.getInt("mem_idx"));
                             loginMember.setMem_id(rs.getString("mem_id"));
-                            loginMember.setMem_pass(hashedPasswordFromDB); // Store hashed password for consistency
+                            loginMember.setMem_pass(hashedPasswordFromDB); // 복호화된 비밀번호
                             loginMember.setMem_name(rs.getString("mem_name"));
                             loginMember.setMem_time(rs.getInt("mem_time"));
                             loginMember.setMem_money(rs.getInt("mem_money"));

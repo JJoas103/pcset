@@ -14,10 +14,10 @@ public class UserView extends JDialog {
     
     public PcCafeDAO dao = new PcCafeDAO();
     public JLabel lblStatus;
-    private MemberDTO currentLoginMember; // Renamed and made private
+    private MemberDTO currentLoginMember; 
 
     public UserView(MemberDTO loginMember) {
-        this.currentLoginMember = loginMember; // Assign constructor parameter
+        this.currentLoginMember = loginMember;
         setTitle("PC방 회원 메뉴 (MVC)");
         setSize(800, 600);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
