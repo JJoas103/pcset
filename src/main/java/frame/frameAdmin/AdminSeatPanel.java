@@ -70,10 +70,23 @@ public class AdminSeatPanel extends JPanel {
 
       
         if (s.getStatus() == 1) { 
-            btn.setBackground(Color.RED);
-            btn.setForeground(Color.WHITE);
+            int age = s.getMemAge();
+            String name = s.getMemName();
+            if (name == null) {
+                // If memName is null in SeatDTO, try to fetch it from MemberDAO
+                int memIdx = s.getMemIdx(); // SeatDTO has getMemIdx()
+                name = mDao.getMemberName(memIdx); // MemberDAO has getMemberName(int memIdx)
+                if (name == null) {
+                    name = "이름 없음"; // Fallback if name is still null
+                }
+            }
+            if(age >= 19) {
+                btn.setBackground(Color.PINK);
+                btn.setForeground(Color.BLACK);
+                btn.setText("<html>"+ seatIdx + "번<br>" + name + "</html>");
+                
+            }
           
-            btn.setText("<html>"+ seatIdx + "번<br>" + s.getMemName() + "</html>");
         } else { 
             btn.setBackground(Color.GREEN);
             btn.setForeground(Color.BLACK);

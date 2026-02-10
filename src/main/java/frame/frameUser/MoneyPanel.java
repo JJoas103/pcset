@@ -62,8 +62,14 @@ public class MoneyPanel extends JPanel {
                 try {
                     int amount = Integer.parseInt(amountField.getText());
                     if (amount > 0) {
+                        // Fetch fresh MemberDTO before charging to ensure correct mem_idx and money
+                        MemberDTO freshMember = mainFrame.dao.getMember(loginMember.getMem_idx());
+                        if (freshMember == null) {
+                            JOptionPane.showMessageDialog(mainFrame, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                         // 금액 충전 로직 (DAO 호출 등)
-                        boolean success = memberDAO.chargeMoney(loginMember, amount);
+                        boolean success = memberDAO.chargeMoney(freshMember, amount); // Use freshMember
                         if (success) {
                             JOptionPane.showMessageDialog(mainFrame, amount + "원 충전 완료!");
                             mainFrame.refreshUserInfo(); // 상단 정보 갱신

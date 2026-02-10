@@ -20,7 +20,8 @@ public class PcCafeDAO extends BaseDAO{
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 MemberDTO member = new MemberDTO();
-                member.setMem_id(rs.getString("mem_idx"));
+                member.setMem_idx(rs.getInt("mem_idx"));
+                member.setMem_id(rs.getString("mem_id"));
                 member.setMem_name(rs.getString("mem_name"));
                 member.setMem_time(rs.getInt("mem_time"));
                 member.setMem_money(rs.getInt("mem_money"));
@@ -53,17 +54,37 @@ public class PcCafeDAO extends BaseDAO{
 
     // 3. 시간 충전
     public boolean chargeTime(int mem_idx, int addTime, int cost) {
+        // 1. 현재 잔액 확인
+        String checkBalanceSql = "SELECT mem_money FROM member WHERE mem_idx = ?";
+        String updateSql = "UPDATE member SET mem_money = mem_money - ?, mem_time = mem_time + ? WHERE mem_idx = ?";
+        
+        try (Connection conn = getConnection()) {
+            // Check balance first
+            try (PreparedStatement checkPstmt = conn.prepareStatement(checkBalanceSql)) {
+                checkPstmt.setInt(1, mem_idx);
+                try (ResultSet rs = checkPstmt.executeQuery()) {
+                    if (rs.next()) {
+                        int currentMoney = rs.getInt("mem_money");
+                        if (currentMoney < cost) {
+                            return false; // 잔액 부족
+                        }
+                    } else {
+                        return false; // 회원 정보 없음
+                    }
+                }
+            }
 
-        String sql = "UPDATE member SET mem_money = mem_money - ?, mem_time = mem_time + ? WHERE mem_idx = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, cost);
-            pstmt.setInt(2, addTime);
-            pstmt.setInt(3, mem_idx);
-            return pstmt.executeUpdate() > 0;
-            
-        } catch (Exception e) { e.printStackTrace(); return false; }
+            // If balance is sufficient, proceed with update
+            try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
+                updatePstmt.setInt(1, cost);
+                updatePstmt.setInt(2, addTime);
+                updatePstmt.setInt(3, mem_idx);
+                return updatePstmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+            return false; 
+        }
     }
     
     // 4. 음식 주문 (트랜잭션 적용)
@@ -109,11 +130,12 @@ public class PcCafeDAO extends BaseDAO{
             upFoodStmt.setInt(1, qty);
             upFoodStmt.setInt(2, food_idx);
             upFoodStmt.executeUpdate();
-            String insertOrder = "insert into orders(mem_idx, seat_idx, food_idx) values (?, ?, ?)";
+            String insertOrder = "insert into orders(mem_idx, seat_idx, food_idx, od_qty) values (?, ?, ?, ?)";
             PreparedStatement inOrderStmt = conn.prepareStatement(insertOrder);
             inOrderStmt.setInt(1, mem_Idx);
             inOrderStmt.setInt(2, seat_idx);
             inOrderStmt.setInt(3, food_idx);
+            inOrderStmt.setInt(4, qty);
             inOrderStmt.executeUpdate();
             conn.commit(); // 커밋
             return "SUCCESS";

@@ -12,12 +12,12 @@ public class OrderDAO extends BaseDAO {
     public List<OrdersDTO> showOrder(){ //모든 주문내역 
         List<OrdersDTO> list = new ArrayList<OrdersDTO>();
         try(Connection conn = getConnection();
-        PreparedStatement pstmt = conn.prepareStatement("select m.mem_name, f.food_name, f.food_stock, o.seat_idx, o.od_idx\r\n" + //
-                        "from orders o\r\n" + //
-                        "join food f\r\n" + //
-                        "on o.food_idx = f.food_idx\r\n" + //
-                        "join member m\r\n" + //
-                        "on o.mem_idx = m.mem_idx"  //
+        PreparedStatement pstmt = conn.prepareStatement("select m.mem_name, f.food_name, f.food_stock, o.seat_idx, o.od_idx, o.od_qty\r\n" + //
+                        "from orders o\r\n" +
+                        "join food f\r\n" +
+                        "on o.food_idx = f.food_idx\r\n" +
+                        "join member m\r\n" +
+                        "on o.mem_idx = m.mem_idx" 
                         )) {
             try (ResultSet rs = pstmt.executeQuery()){
                 while (rs.next()) {
@@ -27,6 +27,7 @@ public class OrderDAO extends BaseDAO {
                     order.setFood_name(rs.getString("food_name"));
                     order.setFood_stock(rs.getInt("food_stock"));
                     order.setSeat_idx(rs.getInt("seat_idx"));
+                    order.setQty(rs.getInt("od_qty"));
                     list.add(order);
                 }
                 

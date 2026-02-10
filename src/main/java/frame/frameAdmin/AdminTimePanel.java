@@ -48,16 +48,28 @@ public class AdminTimePanel extends JPanel {
         timeTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = timeTable.getSelectedRow();
-                tfTimeHour.setText(timeModel.getValueAt(row, 0).toString());
-                tfTimePrice.setText(timeModel.getValueAt(row, 1).toString());
+                if (row != -1) {
+                    tfTimeHour.setText(timeModel.getValueAt(row, 0).toString());
+                    tfTimePrice.setText(timeModel.getValueAt(row, 1).toString());
+                }
             }
         });
 
         btnAdd.addActionListener(e -> {
             try {
-                timeDao.inserthour(Integer.parseInt(tfTimeHour.getText()), Integer.parseInt(tfTimePrice.getText()));
-                refreshTimeTable(); clearTimeInputs();
-            } catch (Exception ex) { JOptionPane.showMessageDialog(null, "추가 실패: " + ex.getMessage()); }
+                int hour = Integer.parseInt(tfTimeHour.getText());
+                int price = Integer.parseInt(tfTimePrice.getText());
+                if (timeDao.inserthour(hour, price)) {
+                    JOptionPane.showMessageDialog(null, "시간 추가 성공!");
+                    refreshTimeTable(); clearTimeInputs();
+                } else {
+                    JOptionPane.showMessageDialog(null, "추가 실패: 이미 존재하는 시간 옵션입니다.", "추가 오류", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "추가 실패: 유효한 시간 또는 가격을 입력하세요.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) { 
+                JOptionPane.showMessageDialog(null, "추가 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE); 
+            }
         });
         btnUpd.addActionListener(e -> {
             try {

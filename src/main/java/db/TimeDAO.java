@@ -54,15 +54,34 @@ public class TimeDAO extends BaseDAO {
         } 
     }  
     //시간 가격 추가
-    public void inserthour(int hour, int price){
+    public boolean inserthour(int hour, int price){
+        if (isTimeOptionExist(hour)) {
+            System.out.println("TimeDAO: Cannot insert, hour " + hour + " already exists.");
+            return false; // Already exists
+        }
         try(Connection conn = getConnection();
             PreparedStatement pstmt = conn.prepareStatement("insert into time_menu(hour, price) values(?,?)")) {
                 pstmt.setInt(1, hour);
                 pstmt.setInt(2, price);
-                pstmt.executeUpdate();
+                int rowsAffected = pstmt.executeUpdate();
+                return rowsAffected > 0;
             
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean isTimeOptionExist(int hour) {
+        String sql = "SELECT 1 FROM time_menu WHERE hour = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, hour);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next(); 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -1,24 +1,33 @@
 package vo;
 
 public class OrdersDTO {
-   int od_idx;
+
+  int od_idx;
   int  mem_idx;
   int seat_idx;
   int food_idx;
   String mem_name;
   String food_name;
   int food_stock;
-    
+  int qty;
   public OrdersDTO(){}
 
+  
   public String getMem_name() {
-      return this.mem_name;
+    return this.mem_name;
   }
-
+  
   public void setMem_name(String mem_name) {
-      this.mem_name = mem_name;
+    this.mem_name = mem_name;
+  }
+  public int getQty() {
+    return this.qty;
   }
 
+  public void setQty(int qty) {
+    this.qty = qty;
+  }
+  
   public String getFood_name() {
       return this.food_name;
   }

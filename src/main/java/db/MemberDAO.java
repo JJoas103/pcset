@@ -73,14 +73,13 @@ public class MemberDAO extends BaseDAO{
 
     //사용자 금액충전 
     public boolean chargeMoney(MemberDTO loginMember, int payMoney) {
-
         try (Connection connection = getConnection();
             PreparedStatement preparedStatement 
                 = connection.prepareStatement("update member set mem_money = mem_money + ? where mem_idx = ?")){
                     preparedStatement.setInt(1, payMoney);
                     preparedStatement.setInt(2, loginMember.getMem_idx());
-                    System.out.println("충전이 완료되었습니다`");
-                    return preparedStatement.executeUpdate() > 0;
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    return rowsAffected > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -199,5 +198,22 @@ public class MemberDAO extends BaseDAO{
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String getMemberName(int memIdx) {
+        String memName = null;
+        String sql = "select mem_name from member where mem_idx = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, memIdx);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    memName = rs.getString("mem_name");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return memName;
     }
 }

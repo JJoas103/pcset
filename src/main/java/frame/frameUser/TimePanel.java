@@ -58,13 +58,20 @@ public class TimePanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int memberIdx = loginMember.getMem_idx();
+            // Fetch fresh MemberDTO before charging to ensure correct mem_idx
+            MemberDTO freshMember = mainFrame.dao.getMember(loginMember.getMem_idx());
+            if (freshMember == null) {
+                JOptionPane.showMessageDialog(mainFrame, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int memberIdx = freshMember.getMem_idx(); // Use mem_idx from fresh MemberDTO
+
             if (mainFrame.dao.chargeTime(memberIdx, addTime, cost)) {
                 JOptionPane.showMessageDialog(mainFrame, 
                                             String.format("%d시간이 충전되었습니다. 금액: %d원", addTime / 60, cost), 
                                             "시간 충전", 
                                             JOptionPane.INFORMATION_MESSAGE);
-                logDAO.insertLog(loginMember.getMem_idx(), 1, cost); // logType: 1 -> 시간충전에 대한 로그
+                logDAO.insertLog(memberIdx, 1, cost); // Use fresh memberIdx for log
                 mainFrame.refreshUserInfo();
             } else {
                 JOptionPane.showMessageDialog(mainFrame, 
