@@ -11,6 +11,7 @@ import javax.swing.JButton;
 
 import java.awt.*;
 import vo.MemberDTO;
+import frame.frameUser.PanelChargeWrapper; // Updated import
 public class PanelUser extends JPanel{
     
     public PanelUser(MemberDTO loginMember) {
@@ -93,17 +94,16 @@ public class PanelUser extends JPanel{
         }
         //좌석선택
         button1.addActionListener(e -> {
-           UserSeat userView = new UserSeat(loginMember); // UserView 인스턴스 생성
+           UserSeat userView = new UserSeat(loginMember); // UserSeat 인스턴스 생성
            userView.setVisible(true); // 새 창을 보이도록 설정
         });
         //음식 주문
         button2.addActionListener(e -> {
-            new UserView(loginMember); // 새로운 PcCafeGUI 창을 띄움
+            FrameBase.getInstance(new PanelChargeWrapper(loginMember)); // 새로운 PcCafeGUI 창을 띄움 (Now PanelChargeWrapper)
         });
         //로그아웃
         button3.addActionListener(e -> {
             FrameBase.getInstance(new PanelStart());
         });
     }
-} 
-
+}

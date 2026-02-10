@@ -14,16 +14,14 @@ import vo.MemberDTO;
 import vo.OrdersDTO;
 
 public class FoodPanel extends JPanel {
-    UserView mainFrame; 
-    MemberDTO loginMember;
+    PanelChargeWrapper parentPanel; 
     DefaultTableModel tableModel;
     JTable foodTable;
     private SeatDAO seatDAO = new SeatDAO(); 
     private LogDAO logDAO = new LogDAO();
 
-    public FoodPanel(UserView mainFrame, MemberDTO loginMember) {
-        this.mainFrame = mainFrame; 
-        this.loginMember = loginMember;
+    public FoodPanel(PanelChargeWrapper parentPanel) { // Modified constructor
+        this.parentPanel = parentPanel; 
         setLayout(new BorderLayout());
         // 테이블 구성
         String[] colNames = {"ID", "음식 이름", "가격", "남은 수량"};
@@ -57,8 +55,11 @@ public class FoodPanel extends JPanel {
                 int qty = Integer.parseInt(input);
                 if (qty <= 0) throw new NumberFormatException();
 
+                // Fetch fresh MemberDTO for current mem_idx
+                MemberDTO currentMember = parentPanel.getCurrentLoginMember(); 
+
                 // seat_idx 가져오기
-                int seatIdx = seatDAO.findSeat(loginMember.getMem_idx());
+                int seatIdx = seatDAO.findSeat(currentMember.getMem_idx());
                 if (seatIdx == 0) {
                     JOptionPane.showMessageDialog(this, "좌석을 선택해야 음식을 주문할 수 있습니다.");
                     return;
@@ -68,12 +69,12 @@ public class FoodPanel extends JPanel {
                 OrdersDTO orderInfo = new OrdersDTO();
                 orderInfo.setSeat_idx(seatIdx);
 
-                String result = mainFrame.dao.orderFood(loginMember.getMem_idx(), foodId, qty, seatIdx);
+                String result = parentPanel.dao.orderFood(currentMember.getMem_idx(), foodId, qty, seatIdx);
 
                 if (result.equals("SUCCESS")) {
                     JOptionPane.showMessageDialog(this, "주문 성공!");
-                    logDAO.insertLog(loginMember.getMem_idx(), 2, foodPrice * qty); // logType: 2 -> 음식주문 로그에 기록
-                    mainFrame.refreshUserInfo();
+                    logDAO.insertLog(currentMember.getMem_idx(), 2, foodPrice * qty); // logType: 2 -> 음식주문 로그에 기록
+                    parentPanel.refreshUserInfo();
                     loadFoodList(); // 재고 갱신
                 } else {
                     JOptionPane.showMessageDialog(this, "실패: " + result);
@@ -87,7 +88,7 @@ public class FoodPanel extends JPanel {
     }                                                                                                                                       
     private void loadFoodList() {                                                                                                      
         tableModel.setRowCount(0);                                                                                           
-        List<FoodDTO> list = mainFrame.dao.getAllFoods();                                                                         
+        List<FoodDTO> list = parentPanel.dao.getAllFoods();                                                                         
         for (FoodDTO f : list) {                                                                                                       
             tableModel.addRow(new Object[]{f.getFood_idx(), f.getFood_name(), f.getFood_price(), f.getFood_stock()});                                                           
         }                                                                                                                              

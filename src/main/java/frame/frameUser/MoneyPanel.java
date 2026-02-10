@@ -10,15 +10,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MoneyPanel extends JPanel {
-    private UserView mainFrame;
-    MemberDTO loginMember;
+    private PanelChargeWrapper parentPanel;
     private JTextField amountField;
     private JButton chargeButton;
 
-    public MoneyPanel(UserView mainFrame, MemberDTO loginMember) {
+    public MoneyPanel(PanelChargeWrapper parentPanel) { // Modified constructor
         MemberDAO memberDAO = new MemberDAO();
-        this.loginMember = loginMember;
-        this.mainFrame = mainFrame;
+        this.parentPanel = parentPanel;
         setLayout(new BorderLayout());
 
         JLabel titleLabel = new JLabel("금액 충전", SwingConstants.CENTER);
@@ -63,24 +61,24 @@ public class MoneyPanel extends JPanel {
                     int amount = Integer.parseInt(amountField.getText());
                     if (amount > 0) {
                         // Fetch fresh MemberDTO before charging to ensure correct mem_idx and money
-                        MemberDTO freshMember = mainFrame.dao.getMember(loginMember.getMem_idx());
+                        MemberDTO freshMember = parentPanel.dao.getMember(parentPanel.getCurrentLoginMember().getMem_idx());
                         if (freshMember == null) {
-                            JOptionPane.showMessageDialog(mainFrame, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(parentPanel, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                         // 금액 충전 로직 (DAO 호출 등)
                         boolean success = memberDAO.chargeMoney(freshMember, amount); // Use freshMember
                         if (success) {
-                            JOptionPane.showMessageDialog(mainFrame, amount + "원 충전 완료!");
-                            mainFrame.refreshUserInfo(); // 상단 정보 갱신
+                            JOptionPane.showMessageDialog(parentPanel, amount + "원 충전 완료!");
+                            parentPanel.refreshUserInfo(); // 상단 정보 갱신
                         } else {
-                            JOptionPane.showMessageDialog(mainFrame, "금액 충전 실패!");
+                            JOptionPane.showMessageDialog(parentPanel, "금액 충전 실패!");
                         }
                     } else {
-                        JOptionPane.showMessageDialog(mainFrame, "양수 값을 입력하세요.");
+                        JOptionPane.showMessageDialog(parentPanel, "양수 값을 입력하세요.");
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(mainFrame, "유효한 금액을 입력하세요.");
+                    JOptionPane.showMessageDialog(parentPanel, "유효한 금액을 입력하세요.");
                 }
             }
         });

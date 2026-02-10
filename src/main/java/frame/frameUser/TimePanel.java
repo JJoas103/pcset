@@ -13,14 +13,12 @@ import db.LogDAO;
 
 public class TimePanel extends JPanel {
 
-    UserView mainFrame; 
-    MemberDTO loginMember;
+    PanelChargeWrapper parentPanel; 
     private LogDAO logDAO;
 
-    public TimePanel(UserView mainFrame, MemberDTO loginMember) {
+    public TimePanel(PanelChargeWrapper parentPanel) { // Modified constructor
 
-        this.mainFrame = mainFrame;
-        this.loginMember = loginMember; 
+        this.parentPanel = parentPanel;
         this.logDAO = new LogDAO();
 
         setLayout(new GridLayout(5, 1, 10, 10));
@@ -59,22 +57,22 @@ public class TimePanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Fetch fresh MemberDTO before charging to ensure correct mem_idx
-            MemberDTO freshMember = mainFrame.dao.getMember(loginMember.getMem_idx());
+            MemberDTO freshMember = parentPanel.dao.getMember(parentPanel.getCurrentLoginMember().getMem_idx()); // Use parentPanel's current member for mem_idx
             if (freshMember == null) {
-                JOptionPane.showMessageDialog(mainFrame, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parentPanel, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int memberIdx = freshMember.getMem_idx(); // Use mem_idx from fresh MemberDTO
 
-            if (mainFrame.dao.chargeTime(memberIdx, addTime, cost)) {
-                JOptionPane.showMessageDialog(mainFrame, 
+            if (parentPanel.dao.chargeTime(memberIdx, addTime, cost)) {
+                JOptionPane.showMessageDialog(parentPanel, 
                                             String.format("%d시간이 충전되었습니다. 금액: %d원", addTime / 60, cost), 
                                             "시간 충전", 
                                             JOptionPane.INFORMATION_MESSAGE);
                 logDAO.insertLog(memberIdx, 1, cost); // Use fresh memberIdx for log
-                mainFrame.refreshUserInfo();
+                parentPanel.refreshUserInfo();
             } else {
-                JOptionPane.showMessageDialog(mainFrame, 
+                JOptionPane.showMessageDialog(parentPanel, 
                                             "금액이 부족합니다.", 
                                             "충전 실패", 
                                             JOptionPane.WARNING_MESSAGE);

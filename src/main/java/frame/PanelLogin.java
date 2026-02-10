@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 
 import db.MemberDAO;
 import frame.frameAdmin.PanelAdmin;
+import frame.frameUser.PanelChargeWrapper; // Changed from UserView
 import frame.frameUser.PanelUser;
-import frame.frameUser.UserView;
 import vo.MemberDTO;
 
 public class PanelLogin extends JPanel {
@@ -128,25 +128,7 @@ public class PanelLogin extends JPanel {
                     JOptionPane.showMessageDialog(this, loginMember.getMem_name() + "님 환영합니다!!", "로그인 성공", JOptionPane.INFORMATION_MESSAGE);
                     if(loginMember.getMem_time() == 0) {
                         JOptionPane.showMessageDialog(this, "시간을 충전해주세요!!", "시간충전", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        UserView pcCafeDialog = new UserView(loginMember);
-                        pcCafeDialog.setModal(true); 
-                        pcCafeDialog.setVisible(true); 
-                        MemberDTO updatedMember = null;
-                        ArrayList<MemberDTO> allMembers = memberDAO.getAllMembers();
-                        for (MemberDTO member : allMembers) {
-                            if (member.getMem_id().equals(loginMember.getMem_id())) {
-                                updatedMember = member;
-                                break;
-                            }
-                        }
-                        
-                        if (updatedMember != null && updatedMember.getMem_time() > 0) {
-                            FrameBase.getInstance(new PanelUser(updatedMember));
-                        } else {
-                            JOptionPane.showMessageDialog(this, "시간이 충전되지 않아 서비스 이용이 제한됩니다.", "안내", JOptionPane.WARNING_MESSAGE);
-                            FrameBase.getInstance(new PanelStart());
-                        }
+                        FrameBase.getInstance(new PanelChargeWrapper(loginMember)); // Navigate to PanelChargeWrapper
                     }
                     else{
                         FrameBase.getInstance(new PanelUser(loginMember));
