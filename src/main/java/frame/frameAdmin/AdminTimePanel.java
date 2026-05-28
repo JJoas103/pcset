@@ -75,12 +75,14 @@ public class AdminTimePanel extends JPanel {
             try {
                 timeDao.updateTimePrice(Integer.parseInt(tfTimeHour.getText()), Integer.parseInt(tfTimePrice.getText()));
                 refreshTimeTable();
+                JOptionPane.showMessageDialog(null, "수정 완료!");
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "수정 실패: " + ex.getMessage()); }
         });
         btnDel.addActionListener(e -> {
             try {
                 timeDao.deleteTime(Integer.parseInt(tfTimeHour.getText()));
                 refreshTimeTable(); clearTimeInputs();
+                JOptionPane.showMessageDialog(null, "삭제 완료!");
             } catch (Exception ex) { JOptionPane.showMessageDialog(null, "삭제 실패: " + ex.getMessage()); }
         });
         btnRef.addActionListener(e -> refreshTimeTable());

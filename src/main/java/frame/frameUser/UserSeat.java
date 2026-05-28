@@ -113,13 +113,22 @@ public class UserSeat extends JDialog {
             } else {
                 btn.setBackground(Color.RED);
                 btn.setText(seatIdx + " 사용중");
+                
             }
         }
-        // 빈좌석
-        else {
+        else if(s.getStatus() == 2){
+            btn.setBackground(Color.BLACK);
+            btn.setForeground(Color.GREEN);
+            btn.setText(seatIdx + "수리중");
+            btn.setEnabled(true);
+            
+            return btn;
+        } 
+        else { // 빈좌석
             btn.setBackground(Color.GREEN);
             btn.setForeground(Color.BLACK);
             btn.setText(seatIdx + " 빈좌석");
+            btn.setEnabled(true);
 
             btn.addActionListener(e -> handleEmptySeatClick(seatIdx));
         }

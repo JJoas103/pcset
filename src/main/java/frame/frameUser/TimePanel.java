@@ -3,42 +3,43 @@ package frame.frameUser;
 import javax.swing.*;
 
 import vo.MemberDTO;
+import vo.TimeDTO;
+import java.util.List;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import db.LogDAO;
+import db.TimeDAO;
 
 
 public class TimePanel extends JPanel {
 
     PanelChargeWrapper parentPanel; 
     private LogDAO logDAO;
+    private TimeDAO timeDAO;
 
     public TimePanel(PanelChargeWrapper parentPanel) { // Modified constructor
 
         this.parentPanel = parentPanel;
         this.logDAO = new LogDAO();
-
-        setLayout(new GridLayout(5, 1, 10, 10));
+        this.timeDAO = new TimeDAO();
+        setLayout(new GridLayout(0, 1, 10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); 
 
-        int[][] timeOptions = {
+        // [재활용 지점] 작성하신 DAO 메서드 호출
+        List<TimeDTO> timeMenuList = timeDAO.getAllTime();
 
-            {60, 1000, 1},
-            {120, 2000, 2},
-            {180, 3000, 3}, 
-            {300, 5000, 5}, 
-            {600, 10000, 10} 
-        };
+        for (TimeDTO time : timeMenuList) {
+            int hour = time.getHour();
+            int cost = time.getPrice();
+            int addTime = hour * 60; // DB에는 시간이 분으로 저장됨
 
-        for (int[] option : timeOptions) {
-            int addTime = option[0];
-            int cost = option[1];
-            int displayTime = option[2];
-            JButton btn = new JButton(String.format("%d시간 (%d원)", displayTime, cost));
+            JButton btn = new JButton(String.format("%d시간 (%d원)", hour, cost));
             btn.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            
+            // 기존의 액션 리스너 연결
             btn.addActionListener(new TimeChargeActionListener(addTime, cost));
             add(btn);
         }
@@ -62,9 +63,14 @@ public class TimePanel extends JPanel {
                 JOptionPane.showMessageDialog(parentPanel, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            int confirmResult = JOptionPane.showConfirmDialog(parentPanel,
+                                                            String.format("%d시간을 충전 하시겠습니까?", addTime / 60),
+                                                            "시간 충전 확인",
+                                                            JOptionPane.YES_NO_OPTION);
             int memberIdx = freshMember.getMem_idx(); // Use mem_idx from fresh MemberDTO
 
-            if (parentPanel.dao.chargeTime(memberIdx, addTime, cost)) {
+            if(confirmResult == JOptionPane.YES_OPTION) {
+                if (parentPanel.dao.chargeTime(memberIdx, addTime, cost)) {
                 JOptionPane.showMessageDialog(parentPanel, 
                                             String.format("%d시간이 충전되었습니다. 금액: %d원", addTime / 60, cost), 
                                             "시간 충전", 
@@ -77,6 +83,8 @@ public class TimePanel extends JPanel {
                                             "충전 실패", 
                                             JOptionPane.WARNING_MESSAGE);
             }
+            }
+            
         }
     }
 }

@@ -61,86 +61,104 @@ public class SeatDAO extends BaseDAO{
 
     //좌석 선택 앉기: 빈좌석(status == 0 일때만 성공)
     public boolean selectSeat(int seatIdx, int memIdx){
-        boolean result = false;
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement
-             = connection.prepareStatement("update seat set mem_idx = ?, status = 1 " + "where seat_idx = ? and status = 0");) {
-                preparedStatement.setInt(1, memIdx);
-                preparedStatement.setInt(2, seatIdx);
-                
-                int count = preparedStatement.executeUpdate();
-                if (count == 1){
-                    result = true;
-                }
+    boolean result = false;
+    // 쿼리 설명: member 테이블에서 해당 memIdx의 이름과 나이를 가져와서 seat 테이블에 한 번에 업데이트함
+    String sql = "UPDATE seat s, member m " +
+                 "SET s.mem_idx = m.mem_idx, " +
+                 "    s.mem_name = m.mem_name, " +
+                 "    s.mem_age = m.mem_age, " +
+                 "    s.status = 1 " +
+                 "WHERE s.seat_idx = ? AND s.status = 0 AND m.mem_idx = ?";
+
+    try (Connection connection = getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
+            preparedStatement.setInt(1, seatIdx);
+            preparedStatement.setInt(2, memIdx);
+            
+            int count = preparedStatement.executeUpdate();
+            if (count == 1){
+                result = true;
+            }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-    //좌석이동
-    public boolean moveSeat(int memIdx, int fromSeatIdx, int toSeatIdx) {// 2개의 시트idx
+    return result;
+}
+    public boolean moveSeat(int memIdx, int fromSeatIdx, int toSeatIdx) {
+    String clearSql = "UPDATE seat SET mem_idx = NULL, mem_name = NULL, mem_age = NULL, status = 0 " +
+                      "WHERE seat_idx = ? AND mem_idx = ?";
+    
+    String occupySql = "UPDATE seat s, member m " +
+                       "SET s.mem_idx = m.mem_idx, s.mem_name = m.mem_name, s.mem_age = m.mem_age, s.status = 1 " +
+                       "WHERE s.seat_idx = ? AND s.status = 0 AND m.mem_idx = ?";
 
-        boolean result = false;
+    try (Connection connection = getConnection()) {
+        connection.setAutoCommit(false); // 트랜잭션 시작
 
-        try (Connection connection = getConnection()) {
-
-            connection.setAutoCommit(false);
-
-            // 1) 기존 좌석 비우기 (내가 앉아있는 자리만 비워야 함)
-            try (PreparedStatement pstmt1 =
-                    connection.prepareStatement(
-                            "update seat set mem_idx = null, status = 0 " +
-                            "where seat_idx = ? and mem_idx = ? and status = 1"
-                            //멤버idx를 널값, 상태를 0 업데이트 후 내가 선택한 좌석의 상태를 1로
-                    )) {
-
-                pstmt1.setInt(1, fromSeatIdx);
+        try {
+            // 1. 새 좌석 점유 시도 (이미 누가 앉았다면 여기서 바로 실패해야 함)
+            try (PreparedStatement pstmt1 = connection.prepareStatement(occupySql)) {
+                pstmt1.setInt(1, toSeatIdx);
                 pstmt1.setInt(2, memIdx);
-
-                int cnt1 = pstmt1.executeUpdate();
-                if (cnt1 != 1) {                 // 비우기 실패면 전체 취소
+                if (pstmt1.executeUpdate() != 1) {
                     connection.rollback();
                     return false;
                 }
             }
 
-            // 2) 새 좌석 채우기 (빈 좌석일 때만 성공)
-            try (PreparedStatement pstmt2 =
-                    connection.prepareStatement(
-                            "update seat set mem_idx = ?, status = 1 " +
-                            "where seat_idx = ? and status = 0" //내가 선택한 좌석을 빈좌석일때, 선택한 좌석을 사용중으로 변경 
-                    )) {
-
-                pstmt2.setInt(1, memIdx);
-                pstmt2.setInt(2, toSeatIdx);
-
-                int cnt2 = pstmt2.executeUpdate();
-                if (cnt2 != 1) {                 // 채우기 실패면 전체 취소
+            // 2. 기존 좌석 비우기
+            try (PreparedStatement pstmt2 = connection.prepareStatement(clearSql)) {
+                pstmt2.setInt(1, fromSeatIdx);
+                pstmt2.setInt(2, memIdx);
+                if (pstmt2.executeUpdate() != 1) {
                     connection.rollback();
                     return false;
                 }
             }
 
-            connection.commit(); // 둘 다 성공해야 커밋 전체 실행
-            result = true;
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            connection.rollback();
+            throw e;
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+    public boolean leaveSeat(int memIdx) { // 내 자리 클릭 시 퇴실, 빈좌석으로 변경
+        String sql =
+                "UPDATE seat " +
+                "SET mem_idx = NULL, " +
+                "    mem_name = NULL, " +
+                "    mem_age = NULL, " +
+                "    status = 0 " +
+                "WHERE mem_idx = ? AND status = 1";
+        try (
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
+            preparedStatement.setInt(1, memIdx);
+            return preparedStatement.executeUpdate() == 1;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return result;
+        return false;
     }
-    public boolean leaveSeat(int memIdx){// 내자리 클릭시 퇴실, 빈자리로 1
-        String sql = "update seat set mem_idx = null, status = 0 where mem_idx =? and status =1";
-        try(Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                preparedStatement.setInt(1, memIdx);
+    public boolean setRepairStatus(int seatIdx, int status){
+        String sql = "update seat set status = ?, mem_idx = null, mem_name = null, mem_age = null where seat_idx = ?";
+        try(Connection con = getConnection();
+            PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                preparedStatement.setInt(1, status);
+                preparedStatement.setInt(2, seatIdx);
                 return preparedStatement.executeUpdate() == 1;
-            
         } catch (Exception e) {
             e.printStackTrace();
-        } return false;
-
+        }return false;
     }
 }

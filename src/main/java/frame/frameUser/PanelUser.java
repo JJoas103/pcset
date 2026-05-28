@@ -11,7 +11,6 @@ import javax.swing.JButton;
 
 import java.awt.*;
 import vo.MemberDTO;
-import frame.frameUser.PanelChargeWrapper; // Updated import
 public class PanelUser extends JPanel{
     
     public PanelUser(MemberDTO loginMember) {

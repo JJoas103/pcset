@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 public class PanelChargeWrapper extends JPanel {
 
-    public PcCafeDAO dao = new PcCafeDAO(); // This dao is for PcCafeDAO methods like getMember, chargeTime
-    private MemberDAO memberDAO; // This memberDAO is for MemberDAO methods like getAllMembers, chargeMoney
+    public PcCafeDAO dao = new PcCafeDAO(); 
+    private MemberDAO memberDAO; 
 
     public JLabel lblStatus;
     private MemberDTO currentLoginMember;

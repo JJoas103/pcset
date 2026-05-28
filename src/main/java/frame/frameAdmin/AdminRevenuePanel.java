@@ -9,6 +9,8 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 public class AdminRevenuePanel extends JPanel {
 
     private LogDAO lDao;
@@ -21,7 +23,15 @@ public class AdminRevenuePanel extends JPanel {
 
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        String[] years = {"2024", "2025", "2026"};
+        ArrayList<String> yearList = new ArrayList<>();
+
+        int startYear = 2023; // 최소(시작) 연도
+        int currentYear = LocalDate.now().getYear();
+        for (int y = startYear; y <= currentYear; y++) {
+            yearList.add(String.valueOf(y));
+        }
+
+
         String[] months = new String[12];
         for(int i=0; i < 12; i++) months[i] = String.format("%02d", i+1);
 
@@ -29,9 +39,9 @@ public class AdminRevenuePanel extends JPanel {
         days[0] = "전체";
         for (int i = 1; i <= 31; i++) days[i] = String.format("%02d", i);
 
-        JComboBox<String> yearCombo = new JComboBox<>(years);
+        JComboBox<String> yearCombo = new JComboBox<>(yearList.toArray(new String[0]));
         JComboBox<String> monthCombo = new JComboBox<>(months);
-        JComboBox<String> dayCombo = new JComboBox<>(days);
+        JComboBox<String> dayCombo = new JComboBox<>(days);  
 
         LocalDate now = LocalDate.now();
         yearCombo.setSelectedItem(String.valueOf(now.getYear()));
@@ -52,11 +62,30 @@ public class AdminRevenuePanel extends JPanel {
 
         // [중앙] 테이블
         String[] headers = {"날짜/시간", "회원이름", "구분", "금액"};
-        logModel = new DefaultTableModel(headers, 0);
+        logModel = new DefaultTableModel(headers, 0) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 3) return Integer.class;
+                return super.getColumnClass(columnIndex);
+            }
+        };
         JTable table = new JTable(logModel);
         
         JScrollPane scroll = new JScrollPane(table);
         table.setAutoCreateRowSorter(true);
+
+        // 금액 컬럼 우측 정렬 및 포맷팅
+        table.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (value instanceof Number) {
+                    setText(String.format("%,d 원", ((Number) value).intValue()));
+                    setHorizontalAlignment(JLabel.RIGHT);
+                }
+                return this;
+            }
+        });
 
         // [하단] 합계 라벨
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -64,6 +93,7 @@ public class AdminRevenuePanel extends JPanel {
         revenueLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
         revenueLabel.setForeground(Color.BLACK);
         bottomPanel.add(revenueLabel);
+
 
         // -------------------------------------------------------
         // [버튼 클릭 이벤트] 핵심 로직
@@ -121,7 +151,7 @@ public class AdminRevenuePanel extends JPanel {
                     log.getLogDate(),   
                     log.getMemName(),   
                     typeStr,           
-                    String.format("%,d 원", log.getLogAmount()) 
+                    log.getLogAmount()
                 };
                 logModel.addRow(rowData);
                 if(typeStr.equals("PC요금")) {
