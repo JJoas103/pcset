@@ -20,3 +20,6 @@ target/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Local DB credentials
+src/main/java/resources/db.properties
